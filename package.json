@@ -14,7 +14,8 @@
     "react-component",
     "unit test",
     "test",
-    "react"
+    "react",
+    "jasmine"
   ],
   "author": "Patricio Zavolinsky",
   "license": "MIT",
