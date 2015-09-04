@@ -1,0 +1,38 @@
+{
+  "name": "react-unit",
+  "version": "1.0.0",
+  "description": "Lightweight unit test library for ReactJS.",
+  "main": "dist/react-unit.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pzavolinsky/react-unit.git"
+  },
+  "keywords": [
+    "react-component",
+    "unit test",
+    "test",
+    "react"
+  ],
+  "author": "Patricio Zavolinsky",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pzavolinsky/react-unit/issues"
+  },
+  "homepage": "https://github.com/pzavolinsky/react-unit",
+  "devDependencies": {
+    "del": "^1.2.1",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.2.1",
+    "gulp-insert": "^0.5.0",
+    "gulp-jasmine": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "run-sequence": "^1.1.2"
+  },
+  "dependencies": {
+    "ramda": "^0.17.1",
+    "react": "^0.13.3"
+  }
+}
