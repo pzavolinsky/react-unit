@@ -37,13 +37,13 @@ describe('MyComponent', () => {
 });
 ```
 
-Note that, while this example is using Jasmine, `react-unit` with any other test language of your choice.
+Note that, while this example is using Jasmine, `react-unit` should work with any other test language of your choice.
 
 
 Usage
 -----
 
-To user `react-unit` just require the `createComponent` function:
+To use `react-unit` just require the `createComponent` function:
 
 ```javascript
 var createComponent = require('react-unit');
@@ -61,7 +61,7 @@ or (if, for some reason you are not into JSX):
 var component = createComponent(React.createElement(MyComponent, { value: "hello, world!" }));
 ```
 
-Now that you have a representation of your component you can use it to find actual HTML elements using `findByQuery`:
+Now that you have a representation of your component you can use it to find actual HTML elements calling `findByQuery`:
 
 ```javascript
 var allInputs     = component.findByQuery('input');
