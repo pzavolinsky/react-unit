@@ -32,7 +32,7 @@ describe('stateful controls', () => {
     // And the original component remains unchanged:
     expect(input.props.value).toBe('original');
 
-    // But the new compoment did change:
+    // But the new component did change:
     expect(newInput.props.value).toEqual('new!');
   });
 });
