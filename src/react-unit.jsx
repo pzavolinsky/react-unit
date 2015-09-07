@@ -88,6 +88,8 @@ function includeText(comp) {
 }
 
 var mapComponent = (comp, parent) => {
+  if (typeof comp.type === 'function') return createComponent(comp, parent);
+
   var newComp = new Component(comp, parent);
 
   if (!newComp.props) return newComp;
@@ -101,9 +103,7 @@ var mapComponent = (comp, parent) => {
     c => {
       if (typeof c === 'string') newComp.texts.push(c);
       else {
-        var childComp = (typeof c.type === 'function')
-          ? createComponent(c, newComp)
-          : mapComponent(c, newComp);
+        var childComp = mapComponent(c, newComp);
         newChildren.push(childComp);
         if (includeText(childComp)) {
             newComp.texts = newComp.texts.concat(childComp.texts);

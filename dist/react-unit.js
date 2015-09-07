@@ -35,7 +35,7 @@ var Component = (function () {
     this.nodeType = 1;
     this.parentNode = parent;
     this.nodeName = this.type;
-    this.getElementsByTagName = this.findByType;
+    this.getElementsByTagName = this.findByTag;
     this.getElementsByClassName = this.findByClassName;
     this.getAttribute = function (n) {
       return _this.prop(n == 'class' ? 'className' : n);
@@ -65,8 +65,8 @@ var Component = (function () {
       }))(children);
     }
   }, {
-    key: 'findByType',
-    value: function findByType(type) {
+    key: 'findByTag',
+    value: function findByTag(type) {
       return this.findBy(type == '*' ? function (c) {
         return true;
       } : function (c) {
@@ -137,6 +137,8 @@ function includeText(comp) {
 }
 
 var mapComponent = function mapComponent(comp, parent) {
+  if (typeof comp.type === 'function') return createComponent(comp, parent);
+
   var newComp = new Component(comp, parent);
 
   if (!newComp.props) return newComp;
@@ -148,7 +150,7 @@ var mapComponent = function mapComponent(comp, parent) {
 
   React.Children.forEach(newComp.props.children, function (c) {
     if (typeof c === 'string') newComp.texts.push(c);else {
-      var childComp = typeof c.type === 'function' ? createComponent(c, newComp) : mapComponent(c, newComp);
+      var childComp = mapComponent(c, newComp);
       newChildren.push(childComp);
       if (includeText(childComp)) {
         newComp.texts = newComp.texts.concat(childComp.texts);

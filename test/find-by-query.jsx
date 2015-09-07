@@ -29,6 +29,9 @@ var ByTagAndAttr = React.createClass({
     </div>
   }
 });
+var ByTagComposite = React.createClass({
+  render: function() { return <ByTag/>; }
+});
 
 describe('findByQuery', () => {
   it('should find by tag name', () => {
@@ -88,5 +91,13 @@ describe('findByQuery', () => {
 
     expect(inputs.length).toEqual(1);
     expect(inputs[0].props.value).toEqual('found');
+  });
+  it('should find by tag name in a composite component', () => {
+    var component = createComponent(<ByTagComposite/>);
+
+    // Find every element with <input> tag
+    var input = component.findByQuery('input')[0];
+
+    expect(input.props.value).toEqual('found');
   });
 });
