@@ -102,7 +102,7 @@ var mapComponent = (comp, parent) => {
   React.Children.forEach(newComp.props.children,
     c => {
       if (typeof c === 'string') newComp.texts.push(c);
-      else {
+      else if (c) {
         var childComp = mapComponent(c, newComp);
         newChildren.push(childComp);
         if (includeText(childComp)) {
