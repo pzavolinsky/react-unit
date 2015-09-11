@@ -13,6 +13,10 @@ var WithNullChildren = React.createClass({
   }
 });
 
+var WithChildren = React.createClass({
+  render: function() { return <div>{this.props.child}</div> }
+});
+
 describe('createComponent', () => {
   it('should work with null children', () => {
     var component = createComponent(<WithNullChildren/>);
@@ -20,5 +24,15 @@ describe('createComponent', () => {
     var lis = component.findByQuery('li');
 
     expect(lis.length).toEqual(2);
+  });
+
+  it('should load numeric children', () => {
+    var component = createComponent(<WithChildren child={1}/>);
+    expect(component.text).toEqual('1');
+  });
+
+  it('should load text children', () => {
+    var component = createComponent(<WithChildren child={'hey!'}/>);
+    expect(component.text).toEqual('hey!');
   });
 });

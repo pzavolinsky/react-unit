@@ -99,9 +99,11 @@ var mapComponent = (comp, parent) => {
 
   var newChildren = [];
 
+  var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
+
   React.Children.forEach(newComp.props.children,
     c => {
-      if (typeof c === 'string') newComp.texts.push(c);
+      if (isText(typeof c)) newComp.texts.push(c);
       else if (c) {
         var childComp = mapComponent(c, newComp);
         newChildren.push(childComp);
