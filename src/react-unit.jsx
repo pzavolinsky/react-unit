@@ -128,9 +128,9 @@ var createComponentInRenderer = (renderer, ctor, parent) => {
 var createComponent = (ctor, parent) => {
   const shallowRenderer = TestUtils.createRenderer();
   var component = createComponentInRenderer(shallowRenderer, ctor, parent);
-  component.renderNew = () => createComponentInRenderer(
+  component.renderNew = (newCtor) => createComponentInRenderer(
     shallowRenderer,
-    ctor,
+    newCtor||ctor,
     parent
   );
   return component;

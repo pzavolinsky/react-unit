@@ -175,8 +175,8 @@ var createComponentInRenderer = function createComponentInRenderer(renderer, cto
 var createComponent = function createComponent(ctor, parent) {
   var shallowRenderer = TestUtils.createRenderer();
   var component = createComponentInRenderer(shallowRenderer, ctor, parent);
-  component.renderNew = function () {
-    return createComponentInRenderer(shallowRenderer, ctor, parent);
+  component.renderNew = function (newCtor) {
+    return createComponentInRenderer(shallowRenderer, newCtor || ctor, parent);
   };
   return component;
 };
