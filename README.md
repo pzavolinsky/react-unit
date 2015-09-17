@@ -3,6 +3,8 @@ react-unit
 
 React Unit is a lightweight unit test library for ReactJS with very few (js-only) dependencies.
 
+By using `react-unit` you can run your ReactJS unit tests directly from node or gulp without having to install any heavyweight external dependencies (such as `jsdom`, `phantomjs`, the python runtime, etc.).
+
 Installation
 ------------
 
@@ -102,6 +104,6 @@ Note that testing **stateful** components require additional effort. See [test/s
 
 For more examples on how to test **events** refer to [test/events.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/events.jsx).
 
-For more examples on finding elements by query selectors refer to [test/find-by-query.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/find-by-query.jsx).
+For more examples on finding elements by **query selectors** refer to [test/find-by-query.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/find-by-query.jsx).
 
-For more examples on finding element using a custom function refer to [test/find-by.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/find-by.jsx).
+For more examples on finding element using a **custom function** refer to [test/find-by.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/find-by.jsx).
