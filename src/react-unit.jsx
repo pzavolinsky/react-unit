@@ -35,6 +35,11 @@ class Component {
   }
   prop(name) { return (this.props || {})[name]; }
 
+  componentProp(name) {
+    var props = this.componentInstance && this.componentInstance._store && this.componentInstance._store.props;
+    return (props || {})[name];
+  }
+
   findBy(fn) {
     var ret = [];
     if (fn(this)) ret.push(this);
@@ -57,7 +62,7 @@ class Component {
     return this.findBy(e => pattern.test(e.prop('className')));
   }
   findByComponent(componentClass) {
-    return this.findBy(e => TestUtils.isElementOfType(e.originalComponent, componentClass));
+    return this.findBy(e => TestUtils.isElementOfType(e.componentInstance, componentClass));
   }
   on(event,e) {
     event = 'on'+event[0].toUpperCase()+event.slice(1);
@@ -131,7 +136,7 @@ var createComponentInRenderer = (renderer, ctor, parent) => {
 var createComponent = (ctor, parent) => {
   const shallowRenderer = TestUtils.createRenderer();
   var component = createComponentInRenderer(shallowRenderer, ctor, parent);
-  component.originalComponent = ctor;
+  component.componentInstance = ctor;
   component.renderNew = (newCtor) => createComponentInRenderer(
     shallowRenderer,
     newCtor||ctor,

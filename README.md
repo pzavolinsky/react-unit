@@ -109,6 +109,12 @@ expect(list.length).toEqual(2);
 
 ```
 
+And assert the props of the component
+
+```javascript
+expect(list[0].componentProp('title')).toEqual('MyTitle');
+```
+
 Note that testing **stateful** components require additional effort. See [test/stateful.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/stateful.jsx) for more details.
 
 For more examples on how to test **events** refer to [test/events.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/events.jsx).
