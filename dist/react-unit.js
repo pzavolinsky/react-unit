@@ -52,6 +52,12 @@ var Component = (function () {
       return (this.props || {})[name];
     }
   }, {
+    key: 'componentProp',
+    value: function componentProp(name) {
+      var props = this.componentInstance && this.componentInstance._store && this.componentInstance._store.props;
+      return (props || {})[name];
+    }
+  }, {
     key: 'findBy',
     value: function findBy(fn) {
       var ret = [];
@@ -79,6 +85,13 @@ var Component = (function () {
       var pattern = new RegExp('(^|\\s)' + search + '(\\s|$)');
       return this.findBy(function (e) {
         return pattern.test(e.prop('className'));
+      });
+    }
+  }, {
+    key: 'findByComponent',
+    value: function findByComponent(componentClass) {
+      return this.findBy(function (e) {
+        return TestUtils.isElementOfType(e.componentInstance, componentClass);
       });
     }
   }, {
@@ -175,6 +188,7 @@ var createComponentInRenderer = function createComponentInRenderer(renderer, cto
 var createComponent = function createComponent(ctor, parent) {
   var shallowRenderer = TestUtils.createRenderer();
   var component = createComponentInRenderer(shallowRenderer, ctor, parent);
+  component.componentInstance = ctor;
   component.renderNew = function (newCtor) {
     return createComponentInRenderer(shallowRenderer, newCtor || ctor, parent);
   };
