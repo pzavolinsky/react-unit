@@ -100,6 +100,15 @@ Finally assert the event:
 expect(changeEvent).toBe('some event');
 ```
 
+If you want to test if the component is rendering the right sub-components in right amount. You can use `findByComponent`
+method to find them.
+
+```javascript
+var list = component.findByComponent(MyComponent);
+expect(list.length).toEqual(2);
+
+```
+
 Note that testing **stateful** components require additional effort. See [test/stateful.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/stateful.jsx) for more details.
 
 For more examples on how to test **events** refer to [test/events.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/events.jsx).

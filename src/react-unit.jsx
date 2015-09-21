@@ -56,6 +56,9 @@ class Component {
     var pattern = new RegExp('(^|\\s)' + search + '(\\s|$)');
     return this.findBy(e => pattern.test(e.prop('className')));
   }
+  findByComponent(componentClass) {
+    return this.findBy(e => TestUtils.isElementOfType(e.originalComponent, componentClass));
+  }
   on(event,e) {
     event = 'on'+event[0].toUpperCase()+event.slice(1);
     var handler = this.props[event];
@@ -128,6 +131,7 @@ var createComponentInRenderer = (renderer, ctor, parent) => {
 var createComponent = (ctor, parent) => {
   const shallowRenderer = TestUtils.createRenderer();
   var component = createComponentInRenderer(shallowRenderer, ctor, parent);
+  component.originalComponent = ctor;
   component.renderNew = (newCtor) => createComponentInRenderer(
     shallowRenderer,
     newCtor||ctor,
