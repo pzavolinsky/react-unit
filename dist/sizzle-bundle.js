@@ -1,3 +1,4 @@
+
 var document = {
 	createElement: function(tag) {
 		return {
@@ -11,11 +12,15 @@ var document = {
 	nodeType: 9,
 	documentElement: { nodeName: 'HTML' }
 };
-global.document = document;
 document.ownerDocument = document;
-var window = { document: document }
+var window = { document: document };
 
-var _ = /*!
+if (!global.document) {
+	global.document = document;
+}
+
+var _ = (function() {
+	/*!
  * Sizzle CSS Selector Engine v2.2.1-pre
  * http://sizzlejs.com/
  *
@@ -2158,3 +2163,4 @@ if ( typeof define === "function" && define.amd ) {
 
 })( window );
 ;
+})(window);
