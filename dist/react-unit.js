@@ -141,13 +141,13 @@ var includeText = function includeText(comp) {
 var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
 
 // Mapping
-var mapChildren = function mapChildren(comp) {
+var mapChildren = function mapChildren(mapFn, comp) {
   var children = [];
   var texts = [];
 
   React.Children.forEach(comp.props.children, function (c) {
     if (isText(typeof c)) texts.push(c);else if (c) {
-      var childComp = mapComponent(c, comp);
+      var childComp = mapFn(c);
       children.push(childComp);
       if (includeText(childComp)) {
         texts = texts.concat(childComp.texts);
@@ -163,8 +163,8 @@ var mapChildren = function mapChildren(comp) {
   };
 };
 
-var mapComponent = function mapComponent(comp, parent) {
-  if (typeof comp.type === 'function') return createComponent(comp, parent);
+var mapComponent = R.curry(function (compCtor, parent, comp) {
+  if (typeof comp.type === 'function') return compCtor(parent, comp);
 
   var newComp = new Component(comp, parent);
 
@@ -173,26 +173,64 @@ var mapComponent = function mapComponent(comp, parent) {
   var oldChildren = newComp.props.children;
   if (!oldChildren || oldChildren.length === 0) return newComp;
 
-  var mappedChildren = mapChildren(newComp);
+  var mapFn = mapComponent(compCtor, newComp);
+  var mappedChildren = mapChildren(mapFn, newComp);
   newComp.props.children = mappedChildren.children;
   newComp.texts = mappedChildren.texts;
   newComp.text = newComp.texts.join(' ');
   return newComp;
-};
+});
 
 // Ctors
-var createComponentInRenderer = function createComponentInRenderer(renderer, ctor, parent) {
+var createComponentInRenderer = R.curry(function (renderer, compCtor, parent, ctor) {
   renderer.render(ctor);
-  return mapComponent(renderer.getRenderOutput(), parent);
-};
+  return mapComponent(compCtor, parent, renderer.getRenderOutput());
+});
 
-var createComponent = function createComponent(ctor, parent) {
+var createComponent = R.curry(function (compCtor, parent, ctor) {
   var shallowRenderer = TestUtils.createRenderer();
-  var component = createComponentInRenderer(shallowRenderer, ctor, parent);
+  var create = createComponentInRenderer(shallowRenderer, compCtor, parent);
+  var component = create(ctor);
   component.renderNew = function (newCtor) {
-    return createComponentInRenderer(shallowRenderer, newCtor || ctor, parent);
+    return create(newCtor || ctor);
   };
   return component;
-};
+});
 
-module.exports = createComponent;
+// Default behavior: recursively call create component
+var createComponentDeep = R.curry(function (parent, ctor) {
+  return createComponent(createComponentDeep, parent, ctor);
+});
+
+// Only process a single level of react components (honoring all the HTML
+// in-between).
+var createComponentShallow = createComponent(function (parent, ctor) {
+  return new Component({
+    type: ctor.type.displayName,
+    _store: ctor._store
+  }, parent);
+});
+
+// Same as createComponentDeep but interleaves <MyComponent> tags, rendering
+// a pseudo-html that includes both react components and actual HTML output.
+var createComponentInterleaved = R.curry(function (parent, ctor) {
+  var store = ctor._store || {};
+  var props = R.merge(store.props, {}); // shallow copy, to be mutated
+
+  var comp = new Component({
+    type: ctor.type.displayName,
+    _store: R.merge(store, { props: props })
+  }, parent);
+
+  var childComp = createComponent(createComponentInterleaved, comp, ctor);
+
+  props.children = childComp;
+
+  return comp;
+});
+
+var exportedFn = createComponentDeep(null);
+exportedFn.shallow = createComponentShallow(null);
+exportedFn.interleaved = createComponentInterleaved(null);
+
+module.exports = exportedFn;
