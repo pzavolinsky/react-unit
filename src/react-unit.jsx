@@ -81,10 +81,37 @@ class Component {
   }
 }
 
+// Text functions
 var excludeTextFrom = ['option', 'optgroup', 'textarea', 'button'];
 
-function includeText(comp) {
-  return comp && excludeTextFrom.indexOf((comp.type||'').toLowerCase()) == -1;
+var includeText = (comp) => comp
+  && excludeTextFrom.indexOf((comp.type||'').toLowerCase()) == -1;
+
+var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
+
+// Mapping
+var mapChildren = (comp) => {
+  var children = [];
+  var texts = [];
+
+  React.Children.forEach(comp.props.children,
+    c => {
+      if (isText(typeof c)) texts.push(c);
+      else if (c) {
+        var childComp = mapComponent(c, comp);
+        children.push(childComp);
+        if (includeText(childComp)) {
+            texts = texts.concat(childComp.texts);
+        }
+      }
+  });
+
+  if (children.length == 1) children = children[0];
+
+  return {
+    children: children,
+    texts: texts
+  };
 }
 
 var mapComponent = (comp, parent) => {
@@ -97,29 +124,14 @@ var mapComponent = (comp, parent) => {
   var oldChildren = newComp.props.children;
   if (!oldChildren || oldChildren.length === 0) return newComp;
 
-  var newChildren = [];
-
-  var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
-
-  React.Children.forEach(newComp.props.children,
-    c => {
-      if (isText(typeof c)) newComp.texts.push(c);
-      else if (c) {
-        var childComp = mapComponent(c, newComp);
-        newChildren.push(childComp);
-        if (includeText(childComp)) {
-            newComp.texts = newComp.texts.concat(childComp.texts);
-        }
-      }
-  });
-
-  if (newChildren.length == 1) newChildren = newChildren[0];
-
-  newComp.props.children = newChildren;
+  var mappedChildren = mapChildren(newComp);
+  newComp.props.children = mappedChildren.children;
+  newComp.texts = mappedChildren.texts;
   newComp.text = newComp.texts.join(' ');
   return newComp;
 }
 
+// Ctors
 var createComponentInRenderer = (renderer, ctor, parent) => {
   renderer.render(ctor);
   return mapComponent(renderer.getRenderOutput(), parent);
