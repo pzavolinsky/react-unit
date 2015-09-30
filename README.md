@@ -80,6 +80,16 @@ var all = component.findBy(function() { return true; }); // () => true
 var moreThanTwo = component.findBy(function(c) { return c.props.value > 2 });
 ```
 
+If you want to find a component using a component variable instead of a string expression, you can use `findByComponent`:
+
+```javascript
+var component = createComponent.shallow(<CompositeComponent />); // Note: the .shallow!
+// or var component = createComponent.interleaved(<CompositeComponent />);
+
+var children = component.findByComponent(ChildComponent);
+```
+Note that `findByComponent` only works with `shallow` and `interleaved` rendering modes. See [Rendering Modes](#Rendering Modes) below for more details.
+
 If you want to test event handling, you can bind a handler to your component:
 
 ```javascript
@@ -99,6 +109,173 @@ Finally assert the event:
 ```javascript
 expect(changeEvent).toBe('some event');
 ```
+
+Rendering Modes
+---------------
+
+#### Deep rendering (default behavior)
+
+By default `react-unit` will use a deep (recursive) rendering strategy. This produces an output that is very similar to that of `React.render`.
+
+For example, given:
+
+```jsx
+var Person = React.createClass({
+  render: function() {
+    var children = React.Children.map(this.props.children, (c,i) => <li key={i}>{c}</li>);
+    return <div><h1>{this.props.name}</h1><ul>{children}</ul></div>
+  }
+});
+```
+
+Calling `createComponent` in a composite component:
+
+```jsx
+var component = createComponent(
+  <Person name="Homer">
+    <Person name="Bart"/>
+    <Person name="Lisa" />
+    <Person name="Maggie" />
+  </Person>);
+```
+
+Results in a representation of the following HTML:
+
+```html
+<div>
+  <h1>Homer</h1>
+  <ul>
+    <li>
+      <div><h1>Bart</h1><ul></ul></div>
+    </li>
+    <li>
+      <div><h1>Lisa</h1><ul></ul></div>
+    </li>
+    <li>
+      <div><h1>Maggie</h1><ul></ul></div>
+    </li>
+  </ul>
+</div>
+```
+
+In other words, the output is the HTML that results of calling the render method of every component. Note that, as a side-effect of deep rendering, component tags (e.g. `<Person/>`) were erased from the HTML representation.
+
+In the example above you find `Lisa` with:
+
+```jsx
+var lisa = component.findByQuery('div > ul > li > div > h1')[1];
+```
+
+On the flip side, you cannot use `findByQuery` to find your components because, after rendering, they were replaced by the HTML they generate in their `render` method:
+
+```jsx
+var persons = component.findByQuery('Person');
+expect(persons.length).toEqual(0);
+```
+
+#### Shallow rendering
+
+Sometimes you might want to stop rendering after the first level of components. In true unit test spirit you would like to just test a component assuming the components it depends upon are working.
+
+To achieve this you can use `createComponent.shallow` as follows:
+
+```jsx
+var component = createComponent.shallow(
+  <Person name="Homer">
+    <Person name="Bart"/>
+    <Person name="Lisa" />
+    <Person name="Maggie" />
+  </Person>);
+```
+
+And the result would be a representation of the following pseudo-HTML:
+
+```html
+<div>
+  <h1>Homer</h1>
+  <ul>
+    <li>
+      <Person name="Bart"/>
+    </li>
+    <li>
+      <Person name="Lisa"/>
+    </li>
+    <li>
+      <Person name="Maggie"/>
+    </li>
+  </ul>
+</div>
+```
+
+To find `Lisa` you could use any of the following:
+
+```jsx
+var lisaByAttr         = component.findByQuery('Person[name=Lisa]')[0];
+var lisaByTagAndOrder  = component.findByQuery('Person')[1];
+var lisaByCompAndOrder = component.findByComponent(Person)[1];
+```
+
+And access the properties as usual:
+
+```jsx
+expect(lisaByAttr.prop('name')).toEqual('Lisa');
+```
+
+#### Interleaved rendering
+
+This rendering mode is similar to the deep mode above with the exception that components are NOT erased form the HTML representation. This means that you can mix and match HTML tags and react components in your `findByQuery` selectors.
+
+To use interleaved rendering call `createComponent.interleaved` as follows:
+
+```jsx
+var component = createComponent.interleaved(
+  <Person name="Homer">
+    <Person name="Bart"/>
+    <Person name="Lisa" />
+    <Person name="Maggie" />
+  </Person>);
+```
+
+The result would be a representation of the following pseudo-HTML:
+
+```html
+<Person name="Homer">
+  <div>
+    <h1>Homer</h1>
+    <ul>
+      <li>
+        <Person name="Bart">
+          <div><h1>Bart</h1><ul></ul></div>
+        </Person>
+      </li>
+      <li>
+        <Person name="Lisa">
+          <div><h1>Lisa</h1><ul></ul></div>
+        </Person>
+      </li>
+      <li>
+        <Person name="Maggie">
+          <div><h1>Maggie</h1><ul></ul></div>
+        </Person>
+      </li>
+    </ul>
+  </div>
+</Person>
+```
+
+And you can find components with:
+
+```jsx
+var lisaComp    = component.findByQuery('Person[name=Lisa]')[0];
+var lisaCompAlt = component.findByComponent(Person)[2];
+
+var lisaName    = component.findByQuery('Person[name=Lisa] h1')[0];
+var lisaNameAlt = lisaComp.findByQuery('h1')[0];
+```
+
+More info
+---------
+
 
 Note that testing **stateful** components require additional effort. See [test/stateful.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/stateful.jsx) for more details.
 

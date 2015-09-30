@@ -26,7 +26,31 @@ var titles = [
   'Last Crusade'
 ];
 
+var Person = React.createClass({
+  render: function() {
+    var children = React.Children.map(this.props.children, (c,i) => <li key={i}>{c}</li>);
+    return <div><h1>{this.props.name}</h1><ul>{children}</ul></div>
+  }
+});
+
 describe('createComponent.shallow', () => {
+  it('renders a single level of depth, preserving components', () => {
+    var component = createComponent.shallow(
+      <Person name="Homer">
+        <Person name="Bart"/>
+        <Person name="Lisa" />
+        <Person name="Maggie" />
+      </Person>);
+
+    var lisaByAttr         = component.findByQuery('Person[name=Lisa]')[0];
+    var lisaByTagAndOrder  = component.findByQuery('Person')[1];
+    var lisaByCompAndOrder = component.findByComponent(Person)[1];
+
+    expect(lisaByAttr.prop('name')).toEqual('Lisa');
+    expect(lisaByTagAndOrder.prop('name')).toEqual('Lisa');
+    expect(lisaByCompAndOrder.prop('name')).toEqual('Lisa');
+  });
+    
   it('should find direct descendent components', () => {
     var component = createComponent.shallow(<Master/>);
 

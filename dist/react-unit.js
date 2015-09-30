@@ -84,6 +84,13 @@ var Component = (function () {
       });
     }
   }, {
+    key: 'findByComponent',
+    value: function findByComponent(componentClass) {
+      return this.findBy(function (e) {
+        return e.componentInstance && TestUtils.isElementOfType(e.componentInstance, componentClass);
+      });
+    }
+  }, {
     key: 'on',
     value: function on(event, e) {
       event = 'on' + event[0].toUpperCase() + event.slice(1);
@@ -184,7 +191,9 @@ var mapComponent = R.curry(function (compCtor, parent, comp) {
 // Ctors
 var createComponentInRenderer = R.curry(function (renderer, compCtor, parent, ctor) {
   renderer.render(ctor);
-  return mapComponent(compCtor, parent, renderer.getRenderOutput());
+  var component = mapComponent(compCtor, parent, renderer.getRenderOutput());
+  component.originalComponentInstance = ctor;
+  return component;
 });
 
 var createComponent = R.curry(function (compCtor, parent, ctor) {
@@ -205,10 +214,12 @@ var createComponentDeep = R.curry(function (parent, ctor) {
 // Only process a single level of react components (honoring all the HTML
 // in-between).
 var createComponentShallow = createComponent(function (parent, ctor) {
-  return new Component({
+  var comp = new Component({
     type: ctor.type.displayName,
     _store: ctor._store
   }, parent);
+  comp.componentInstance = ctor;
+  return comp;
 });
 
 // Same as createComponentDeep but interleaves <MyComponent> tags, rendering
@@ -221,6 +232,7 @@ var createComponentInterleaved = R.curry(function (parent, ctor) {
     type: ctor.type.displayName,
     _store: R.merge(store, { props: props })
   }, parent);
+  comp.componentInstance = ctor;
 
   var childComp = createComponent(createComponentInterleaved, comp, ctor);
 

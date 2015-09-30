@@ -30,7 +30,35 @@ var titles = [
   'Last Crusade'
 ];
 
+var Person = React.createClass({
+  render: function() {
+    var children = React.Children.map(this.props.children, (c,i) => <li key={i}>{c}</li>);
+    return <div><h1>{this.props.name}</h1><ul>{children}</ul></div>
+  }
+});
+
 describe('createComponent.interleaved', () => {
+  it('renders recursively, preserving components', () => {
+    var component = createComponent.interleaved(
+      <Person name="Homer">
+        <Person name="Bart"/>
+        <Person name="Lisa" />
+        <Person name="Maggie" />
+      </Person>);
+
+    var lisaComp    = component.findByQuery('Person[name=Lisa]')[0];
+    var lisaCompAlt = component.findByComponent(Person)[2];
+
+    var lisaName    = component.findByQuery('Person[name=Lisa] h1')[0];
+    var lisaNameAlt = lisaComp.findByQuery('h1')[0];
+
+    expect(lisaComp.prop('name')).toEqual('Lisa');
+    expect(lisaComp).toBe(lisaCompAlt);
+
+    expect(lisaName.text).toEqual('Lisa');
+    expect(lisaNameAlt).toBe(lisaName);
+  });
+
   it('should find component in deeply nested components', () => {
     var component = createComponent.interleaved(<SuperMaster />);
 

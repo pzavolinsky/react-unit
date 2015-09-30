@@ -56,6 +56,10 @@ class Component {
     var pattern = new RegExp('(^|\\s)' + search + '(\\s|$)');
     return this.findBy(e => pattern.test(e.prop('className')));
   }
+  findByComponent(componentClass) {
+    return this.findBy(e => e.componentInstance &&
+      TestUtils.isElementOfType(e.componentInstance, componentClass));
+  }
   on(event,e) {
     event = 'on'+event[0].toUpperCase()+event.slice(1);
     var handler = this.props[event];
@@ -135,7 +139,9 @@ var mapComponent = R.curry((compCtor, parent, comp) => {
 // Ctors
 var createComponentInRenderer = R.curry((renderer, compCtor, parent, ctor) => {
   renderer.render(ctor);
-  return mapComponent(compCtor, parent, renderer.getRenderOutput());
+  var component = mapComponent(compCtor, parent, renderer.getRenderOutput());
+  component.originalComponentInstance = ctor;
+  return component;
 });
 
 var createComponent = R.curry((compCtor, parent, ctor) => {
@@ -154,10 +160,12 @@ var createComponentDeep = R.curry(
 // Only process a single level of react components (honoring all the HTML
 // in-between).
 var createComponentShallow = createComponent((parent, ctor) => {
-  return new Component({
+  var comp = new Component({
     type: ctor.type.displayName,
     _store: ctor._store
   }, parent);
+  comp.componentInstance = ctor;
+  return comp;
 });
 
 // Same as createComponentDeep but interleaves <MyComponent> tags, rendering
@@ -171,6 +179,7 @@ var createComponentInterleaved = R.curry(
       type: ctor.type.displayName,
       _store: R.merge(store, { props: props })
     }, parent);
+    comp.componentInstance = ctor;
 
     var childComp = createComponent(createComponentInterleaved, comp, ctor);
 

@@ -17,7 +17,32 @@ var WithChildren = React.createClass({
   render: function() { return <div>{this.props.child}</div> }
 });
 
+var Person = React.createClass({
+  render: function() {
+    var children = React.Children.map(this.props.children, (c,i) => <li key={i}>{c}</li>);
+    return <div><h1>{this.props.name}</h1><ul>{children}</ul></div>
+  }
+});
+
 describe('createComponent', () => {
+  it('renders recursively, erasing components', () => {
+    var component = createComponent(
+      <Person name="Homer">
+        <Person name="Bart"/>
+        <Person name="Lisa" />
+        <Person name="Maggie" />
+      </Person>);
+
+    var lisa = component.findByQuery('div > ul > li > div > h1')[1];
+
+    expect(lisa.text).toEqual('Lisa');
+
+    var persons = component.findByQuery('Person');
+
+    expect(persons.length).toEqual(0);
+
+  });
+
   it('should work with null children', () => {
     var component = createComponent(<WithNullChildren/>);
 
