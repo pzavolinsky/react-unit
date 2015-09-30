@@ -88,7 +88,7 @@ var component = createComponent.shallow(<CompositeComponent />); // Note: the .s
 
 var children = component.findByComponent(ChildComponent);
 ```
-Note that `findByComponent` only works with `shallow` and `interleaved` rendering modes. See [Rendering Modes](#Rendering Modes) below for more details.
+Note that `findByComponent` only works with `shallow` and `interleaved` rendering modes. See [Rendering Modes](#rendering-modes) below for more details.
 
 If you want to test event handling, you can bind a handler to your component:
 
