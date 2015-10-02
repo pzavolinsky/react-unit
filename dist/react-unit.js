@@ -63,7 +63,7 @@ var Component = (function () {
       if (children.length === undefined) children = [children];
 
       return R.compose(R.concat(ret), R.filter(R.identity), R.flatten, R.map(function (c) {
-        return c.findBy(fn);
+        return c.findBy && c.findBy(fn);
       }))(children);
     }
   }, {

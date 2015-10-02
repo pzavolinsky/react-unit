@@ -83,7 +83,7 @@ describe('createComponent.shallow', () => {
     expect(child).not.toBeUndefined();
   });
 
-  it('should find findByComponent component rendering just a string a children', () => {
+  it('should find component rendering just a string as children', () => {
     var Content = React.createClass({
       render: function() { return <div>{this.props.children}</div> }
     });
@@ -95,6 +95,21 @@ describe('createComponent.shallow', () => {
     });
 
     var component = createComponent.shallow(<Page/>);
+    expect(component.findByComponent(Content).length).toEqual(1);
+  });
+  
+  it('should find component passing the children down to child component', () => {
+    var Content = React.createClass({
+      render: function() { return <div>{this.props.children}</div> }
+    });
+
+    var Page = React.createClass({
+      render: function() { return (
+          <Content>{this.props.children}</Content>
+      )}
+    });
+
+    var component = createComponent.shallow(<Page><div>Here</div></Page>);
     expect(component.findByComponent(Content).length).toEqual(1);
   });
 

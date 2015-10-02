@@ -46,7 +46,7 @@ class Component {
       R.concat(ret),
       R.filter(R.identity),
       R.flatten,
-      R.map(c => c.findBy(fn))
+      R.map(c => c.findBy && c.findBy(fn))
     )(children);
   }
   findByTag(type) {
@@ -116,7 +116,7 @@ var mapChildren = (mapFn, comp) => {
     children: children,
     texts: texts
   };
-}
+};
 
 var mapComponent = R.curry((compCtor, parent, comp) => {
   if (typeof comp.type === 'function') return compCtor(parent, comp);
