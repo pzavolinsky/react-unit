@@ -39,7 +39,7 @@ class Component {
     var ret = [];
     if (fn(this)) ret.push(this);
     var children = this.prop('children');
-    if (!children) return ret;
+    if (!children || isText(typeof children)) return ret;
     if (children.length === undefined) children = [ children ];
 
     return R.compose(

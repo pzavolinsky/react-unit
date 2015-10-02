@@ -50,7 +50,7 @@ describe('createComponent.shallow', () => {
     expect(lisaByTagAndOrder.prop('name')).toEqual('Lisa');
     expect(lisaByCompAndOrder.prop('name')).toEqual('Lisa');
   });
-    
+
   it('should find direct descendent components', () => {
     var component = createComponent.shallow(<Master/>);
 
@@ -81,6 +81,21 @@ describe('createComponent.shallow', () => {
     var child = component.findByQuery('div > Child')[0];
 
     expect(child).not.toBeUndefined();
+  });
+
+  it('should find findByComponent component rendering just a string a children', () => {
+    var Content = React.createClass({
+      render: function() { return <div>{this.props.children}</div> }
+    });
+
+    var Page = React.createClass({
+      render: function() { return (
+          <Content>Test</Content>
+      )}
+    });
+
+    var component = createComponent.shallow(<Page/>);
+    expect(component.findByComponent(Content).length).toEqual(1);
   });
 
   it('should allow findByQuery in component props', () => {
