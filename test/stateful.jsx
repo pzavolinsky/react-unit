@@ -16,10 +16,10 @@ var Stateful = React.createClass({
 
 var SetStateBeforeMount = React.createClass({
   getInitialState: function() {
-    return {mounted: false};
+    return {mounted: 'false'};
   },
   componentWillMount: function() {
-    this.setState({mounted: true});
+    this.setState({mounted: 'true'});
   },
   render: function() {
     return <span className="status">{this.state.mounted}</span>
@@ -50,6 +50,10 @@ describe('stateful controls', () => {
   });
 
   it('can set state in their componentWillMount', () => {
+    // Broken in 0.14 until https://github.com/facebook/react/issues/4461 is
+    // fixed
     var component = createComponent(<SetStateBeforeMount />);
+
+    expect(component.findByQuery('.status')[0].text).toEqual('true');
   });
 });
