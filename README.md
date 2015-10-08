@@ -14,6 +14,7 @@ npm install --save-dev react-unit
 
 and then, in your tests:
 ```javascript
+var React = require('react');
 var createComponent = require('react-unit');
 
 describe('MyComponent', () => {

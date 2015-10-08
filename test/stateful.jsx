@@ -14,6 +14,19 @@ var Stateful = React.createClass({
   }
 });
 
+var SetStateBeforeMount = React.createClass({
+  getInitialState: function() {
+    return {mounted: false};
+  },
+  componentWillMount: function() {
+    this.setState({mounted: true});
+  },
+  render: function() {
+    return <span className="status">{this.state.mounted}</span>
+  }
+});
+
+
 describe('stateful controls', () => {
   it('should handle input changes', () => {
     var component = createComponent(<Stateful value="original" />);
@@ -34,5 +47,9 @@ describe('stateful controls', () => {
 
     // But the new component did change:
     expect(newInput.props.value).toEqual('new!');
+  });
+
+  it('can set state in their componentWillMount', () => {
+    var component = createComponent(<SetStateBeforeMount />);
   });
 });

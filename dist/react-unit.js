@@ -5,9 +5,9 @@ var _createClass = (function () { function defineProperties(target, props) { for
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var R = require('ramda');
+var sizzle = require('./sizzle-bundle');
 var React = require('react');
 var TestUtils = require('react/lib/ReactTestUtils');
-var sizzle = require('./sizzle-bundle');
 
 var Component = (function () {
   function Component(comp, parent) {
@@ -18,7 +18,7 @@ var Component = (function () {
     this.type = comp.type;
     this.key = comp.key;
     this.ref = comp.ref;
-    this.props = R.clone(R.mergeAll([comp._store && comp._store.props, comp.props, {}]));
+    this.props = R.mergeAll([comp._store && comp._store.props, comp.props, {}]);
     this.texts = [];
     this.comp = comp;
 

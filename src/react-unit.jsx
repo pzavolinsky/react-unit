@@ -1,16 +1,14 @@
 var R = require('ramda');
+var sizzle = require('./sizzle-bundle');
 var React = require('react');
 var TestUtils = require('react/lib/ReactTestUtils');
-var sizzle = require('./sizzle-bundle');
 
 class Component {
   constructor(comp, parent) {
     this.type  = comp.type;
     this.key   = comp.key;
     this.ref   = comp.ref;
-    this.props = R.clone(
-      R.mergeAll([comp._store && comp._store.props, comp.props, {}])
-    );
+    this.props = R.mergeAll([comp._store && comp._store.props, comp.props, {}]);
     this.texts = [];
     this.comp = comp;
 
