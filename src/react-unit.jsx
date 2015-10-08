@@ -1,6 +1,6 @@
 var R = require('ramda');
-var React = require('react/addons');
-var TestUtils = React.addons.TestUtils;
+var React = require('react');
+var TestUtils = require('react/lib/ReactTestUtils');
 var sizzle = require('./sizzle-bundle');
 
 class Component {
@@ -8,8 +8,11 @@ class Component {
     this.type  = comp.type;
     this.key   = comp.key;
     this.ref   = comp.ref;
-    this.props = comp._store && comp._store.props;
+    this.props = R.clone(
+      R.mergeAll([comp._store && comp._store.props, comp.props, {}])
+    );
     this.texts = [];
+    this.comp = comp;
 
     // Mock root parent (to enable top-level "[attr=value]")
     if (!parent) {
@@ -162,7 +165,8 @@ var createComponentDeep = R.curry(
 var createComponentShallow = createComponent((parent, ctor) => {
   var comp = new Component({
     type: ctor.type.displayName,
-    _store: ctor._store
+    _store: ctor._store,
+    props: ctor.props
   }, parent);
   comp.componentInstance = ctor;
   return comp;
@@ -173,7 +177,8 @@ var createComponentShallow = createComponent((parent, ctor) => {
 var createComponentInterleaved = R.curry(
   (parent, ctor) => {
     var store = ctor._store || {};
-    var props = R.merge(store.props, {}); // shallow copy, to be mutated
+
+    var props = R.mergeAll([store.props, ctor.props, {}]);
 
     var comp = new Component({
       type: ctor.type.displayName,
@@ -183,7 +188,7 @@ var createComponentInterleaved = R.curry(
 
     var childComp = createComponent(createComponentInterleaved, comp, ctor);
 
-    props.children = childComp;
+    comp.props.children = childComp;
 
     return comp;
   }

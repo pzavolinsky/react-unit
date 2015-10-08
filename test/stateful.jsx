@@ -1,6 +1,6 @@
 // Note: you should use var createComponent = require('react-unit');
 var createComponent = require('./react-unit');
-var React = require('react/addons');
+var React = require('react');
 
 var Stateful = React.createClass({
   getInitialState: function() {

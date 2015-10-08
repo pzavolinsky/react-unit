@@ -1,6 +1,6 @@
 // Note: you should use var createComponent = require('react-unit');
 var createComponent = require('./react-unit');
-var React = require('react/addons');
+var React = require('react');
 var R = require('ramda');
 
 var Child = React.createClass({
@@ -97,7 +97,7 @@ describe('createComponent.shallow', () => {
     var component = createComponent.shallow(<Page/>);
     expect(component.findByComponent(Content).length).toEqual(1);
   });
-  
+
   it('should find component passing the children down to child component', () => {
     var Content = React.createClass({
       render: function() { return <div>{this.props.children}</div> }

@@ -5,8 +5,8 @@ var _createClass = (function () { function defineProperties(target, props) { for
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var R = require('ramda');
-var React = require('react/addons');
-var TestUtils = React.addons.TestUtils;
+var React = require('react');
+var TestUtils = require('react/lib/ReactTestUtils');
 var sizzle = require('./sizzle-bundle');
 
 var Component = (function () {
@@ -18,8 +18,9 @@ var Component = (function () {
     this.type = comp.type;
     this.key = comp.key;
     this.ref = comp.ref;
-    this.props = comp._store && comp._store.props;
+    this.props = R.clone(R.mergeAll([comp._store && comp._store.props, comp.props, {}]));
     this.texts = [];
+    this.comp = comp;
 
     // Mock root parent (to enable top-level "[attr=value]")
     if (!parent) {
@@ -216,7 +217,8 @@ var createComponentDeep = R.curry(function (parent, ctor) {
 var createComponentShallow = createComponent(function (parent, ctor) {
   var comp = new Component({
     type: ctor.type.displayName,
-    _store: ctor._store
+    _store: ctor._store,
+    props: ctor.props
   }, parent);
   comp.componentInstance = ctor;
   return comp;
@@ -226,7 +228,8 @@ var createComponentShallow = createComponent(function (parent, ctor) {
 // a pseudo-html that includes both react components and actual HTML output.
 var createComponentInterleaved = R.curry(function (parent, ctor) {
   var store = ctor._store || {};
-  var props = R.merge(store.props, {}); // shallow copy, to be mutated
+
+  var props = R.mergeAll([store.props, ctor.props, {}]);
 
   var comp = new Component({
     type: ctor.type.displayName,
@@ -236,7 +239,7 @@ var createComponentInterleaved = R.curry(function (parent, ctor) {
 
   var childComp = createComponent(createComponentInterleaved, comp, ctor);
 
-  props.children = childComp;
+  comp.props.children = childComp;
 
   return comp;
 });
