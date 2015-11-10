@@ -81,6 +81,12 @@ var all = component.findBy(function() { return true; }); // () => true
 var moreThanTwo = component.findBy(function(c) { return c.props.value > 2 });
 ```
 
+To find elements by their `ref` attribute, you can use the `findByRef` method:
+
+```javascript
+var allMyRefs = component.findByRef('myRef');
+```
+
 If you want to find a component using a component variable instead of a string expression, you can use `findByComponent`:
 
 ```javascript
