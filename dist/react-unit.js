@@ -68,6 +68,13 @@ var Component = (function () {
       }))(children);
     }
   }, {
+    key: 'findByRef',
+    value: function findByRef(ref) {
+      return this.findBy(function (c) {
+        return c.ref == ref;
+      });
+    }
+  }, {
     key: 'findByTag',
     value: function findByTag(type) {
       return this.findBy(type == '*' ? function (c) {
