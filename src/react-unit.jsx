@@ -147,10 +147,12 @@ var createComponentInRenderer = R.curry((renderer, compCtor, parent, ctor) => {
 
 var createComponent = R.curry((compCtor, parent, ctor) => {
   const shallowRenderer = TestUtils.createRenderer();
-  var create = createComponentInRenderer(shallowRenderer, compCtor, parent);
-  var component = create(ctor);
-  component.renderNew = (newCtor) => create(newCtor||ctor);
-  return component;
+  var create = ctor => {
+    var c = createComponentInRenderer(shallowRenderer, compCtor, parent, ctor);
+    c.renderNew = newCtor => create(newCtor||ctor);
+    return c;
+  }
+  return create(ctor);
 });
 
 // Default behavior: recursively call create component
@@ -174,21 +176,27 @@ var createComponentShallow = createComponent((parent, ctor) => {
 // a pseudo-html that includes both react components and actual HTML output.
 var createComponentInterleaved = R.curry(
   (parent, ctor) => {
-    var store = ctor._store || {};
 
-    var props = R.mergeAll([store.props, ctor.props, {}]);
+    // Ctor1 -> (Comp1 -> Ctor1 -> Comp2) -> Comp1
+    var create = (ctor, childCtor) => {
+      var store = ctor._store || {};
 
-    var comp = new Component({
-      type: ctor.type.displayName,
-      _store: R.merge(store, { props: props })
-    }, parent);
-    comp.componentInstance = ctor;
+      var props = R.mergeAll([store.props, ctor.props, {}]);
 
-    var childComp = createComponent(createComponentInterleaved, comp, ctor);
+      var comp = new Component({
+        type: ctor.type.displayName,
+        _store: R.merge(store, { props: props })
+      }, parent);
+      comp.componentInstance = ctor;
+      comp.props.children = childCtor(comp, ctor);
+      comp.renderNew = newCtor => create(
+        newCtor || ctor, // renderWithCtor
+        (_, renderWithCtor) => comp.props.children.renderNew(renderWithCtor)
+      );
+      return comp;
+    }
 
-    comp.props.children = childComp;
-
-    return comp;
+    return create(ctor, createComponent(createComponentInterleaved));
   }
 );
 

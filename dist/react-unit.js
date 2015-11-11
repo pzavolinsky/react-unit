@@ -199,12 +199,14 @@ var createComponentInRenderer = R.curry(function (renderer, compCtor, parent, ct
 
 var createComponent = R.curry(function (compCtor, parent, ctor) {
   var shallowRenderer = TestUtils.createRenderer();
-  var create = createComponentInRenderer(shallowRenderer, compCtor, parent);
-  var component = create(ctor);
-  component.renderNew = function (newCtor) {
-    return create(newCtor || ctor);
+  var create = function create(ctor) {
+    var c = createComponentInRenderer(shallowRenderer, compCtor, parent, ctor);
+    c.renderNew = function (newCtor) {
+      return create(newCtor || ctor);
+    };
+    return c;
   };
-  return component;
+  return create(ctor);
 });
 
 // Default behavior: recursively call create component
@@ -227,21 +229,29 @@ var createComponentShallow = createComponent(function (parent, ctor) {
 // Same as createComponentDeep but interleaves <MyComponent> tags, rendering
 // a pseudo-html that includes both react components and actual HTML output.
 var createComponentInterleaved = R.curry(function (parent, ctor) {
-  var store = ctor._store || {};
 
-  var props = R.mergeAll([store.props, ctor.props, {}]);
+  // Ctor1 -> (Comp1 -> Ctor1 -> Comp2) -> Comp1
+  var create = function create(ctor, childCtor) {
+    var store = ctor._store || {};
 
-  var comp = new Component({
-    type: ctor.type.displayName,
-    _store: R.merge(store, { props: props })
-  }, parent);
-  comp.componentInstance = ctor;
+    var props = R.mergeAll([store.props, ctor.props, {}]);
 
-  var childComp = createComponent(createComponentInterleaved, comp, ctor);
+    var comp = new Component({
+      type: ctor.type.displayName,
+      _store: R.merge(store, { props: props })
+    }, parent);
+    comp.componentInstance = ctor;
+    comp.props.children = childCtor(comp, ctor);
+    comp.renderNew = function (newCtor) {
+      return create(newCtor || ctor, // renderWithCtor
+      function (_, renderWithCtor) {
+        return comp.props.children.renderNew(renderWithCtor);
+      });
+    };
+    return comp;
+  };
 
-  comp.props.children = childComp;
-
-  return comp;
+  return create(ctor, createComponent(createComponentInterleaved));
 });
 
 var exportedFn = createComponentDeep(null);

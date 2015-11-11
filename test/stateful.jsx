@@ -1,6 +1,7 @@
 // Note: you should use var createComponent = require('react-unit');
 var createComponent = require('./react-unit');
 var React = require('react');
+var R = require('ramda');
 
 var Stateful = React.createClass({
   getInitialState: function() {
@@ -47,6 +48,43 @@ describe('stateful controls', () => {
 
     // But the new component did change:
     expect(newInput.props.value).toEqual('new!');
+  });
+
+  var setAndAssertValue = (comp, value) => {
+    var input = comp.findByQuery('input')[0];
+
+    input.onChange({target:{value: value}});
+
+    var newComp = comp.renderNew();
+    var newInput = newComp.findByQuery('input')[0];
+
+    expect(newInput.props.value).toEqual(value);
+
+    return newComp;
+  }
+
+  it('can be chained in deep mode', () => {
+    var component = createComponent(<Stateful value="original" />);
+
+    var data = ['a','b','c','d','e','f','g'];
+
+    R.reduce(setAndAssertValue, component, data);
+  });
+
+  it('can be chained in interleaved mode', () => {
+    var component = createComponent.interleaved(<Stateful value="original" />);
+
+    var data = ['a','b','c','d','e','f','g'];
+
+    R.reduce(setAndAssertValue, component, data);
+  });
+
+  it('can be chained in shallow mode', () => {
+    var component = createComponent.shallow(<Stateful value="original" />);
+
+    var data = ['a','b','c','d','e','f','g'];
+
+    R.reduce(setAndAssertValue, component, data);
   });
 
   xit('can set state in their componentWillMount', () => {
