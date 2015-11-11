@@ -17,7 +17,10 @@ class Component {
     this.type  = comp.type;
     this.key   = comp.key;
     this.ref   = comp.ref;
-    this.props = R.mergeAll([comp._store && comp._store.props, comp.props, {}]);
+    this.props = R.mergeAll([comp._store && comp._store.props, comp.props, {
+      key: this.key,
+      ref: this.ref
+    }]);
     this.texts = [];
     this.comp = comp;
 

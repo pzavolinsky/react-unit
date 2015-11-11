@@ -32,6 +32,17 @@ var ByTagAndAttr = React.createClass({
 var ByTagComposite = React.createClass({
   render: function() { return <ByTag/>; }
 });
+var ByKey = React.createClass({
+  render: function() {
+    var items = ['a','b','c'].map(i => <li key={i}>{i}</li>);
+    return <ul>{items}</ul>;
+  }
+});
+var ByRef = React.createClass({
+  render: function() {
+    return <div><input {...props} ref="myRef" /></div>;
+  }
+});
 
 describe('findByQuery', () => {
   it('should find by tag name', () => {
@@ -92,11 +103,30 @@ describe('findByQuery', () => {
     expect(inputs.length).toEqual(1);
     expect(inputs[0].props.value).toEqual('found');
   });
+
   it('should find by tag name in a composite component', () => {
     var component = createComponent(<ByTagComposite/>);
 
     // Find every element with <input> tag
     var input = component.findByQuery('input')[0];
+
+    expect(input.props.value).toEqual('found');
+  });
+
+  it('should find by key', () => {
+    var component = createComponent(<ByKey/>);
+
+    // Find every element with key="c"
+    var input = component.findByQuery('[key=c]')[0];
+
+    expect(input.text).toEqual('c');
+  });
+
+  it('should find by ref', () => {
+    var component = createComponent(<ByRef/>);
+
+    // Find every element with ref="myRef"
+    var input = component.findByQuery('[ref=myRef]')[0];
 
     expect(input.props.value).toEqual('found');
   });
