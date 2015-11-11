@@ -71,9 +71,7 @@ class Component {
   onChange(e) { this.on('change', e); }
   onClick(e) { this.on('click', e); }
   setValueKey(n,v) {
-    var o = {};
-    o[n] = v;
-    this.onChange({ target: R.merge(this.props, o) })
+    this.onChange({ target: R.merge(this.props, {[n]: v}) })
   }
   setValue(v) { this.setValueKey('value', v) }
   setChecked(v) { this.setValueKey('checked', v) }
@@ -82,7 +80,6 @@ class Component {
     try {
       return sizzle(s, this.root || this);
     } catch (e) { console.log('Sizzle error', e.stack); throw e; }
-
   }
 }
 
