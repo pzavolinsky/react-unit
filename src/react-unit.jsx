@@ -3,6 +3,15 @@ var sizzle = require('./sizzle-bundle');
 var React = require('react');
 var TestUtils = require('react/lib/ReactTestUtils');
 
+// Text functions
+var excludeTextFrom = ['option', 'optgroup', 'textarea', 'button'];
+
+var includeText = (comp) => comp
+  && excludeTextFrom.indexOf((comp.type||'').toLowerCase()) == -1;
+
+var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
+
+// Component wrapper
 class Component {
   constructor(comp, parent) {
     this.type  = comp.type;
@@ -81,15 +90,33 @@ class Component {
       return sizzle(s, this.root || this);
     } catch (e) { console.log('Sizzle error', e.stack); throw e; }
   }
+
+  dump(padd) {
+    if (!padd) padd = '';
+    var children = this.prop('children');
+    var tag = this.type + R.compose(
+      R.join(''),
+      R.map(([k,v]) => ` ${k}='${v}'`),
+      R.filter(([_,v]) => isText(typeof v) && (v || v === 0)),
+      R.toPairs,
+      R.merge({ key: this.key, ref: this.ref }),
+      R.omit(['children'])
+    )(this.props);
+
+    if (!children || children.length === 0) {
+      return this.text
+        ? `${padd}<${tag}>${this.text}</${this.type}>\n`
+        : `${padd}<${tag} />\n`;
+    }
+
+    if (isText(typeof children)) {
+      return `${padd}<${tag}>${children}</${this.type}>\n`;
+    }
+    if (children.length === undefined) children = [ children ];
+    var texts = R.join('', R.map(c => c.dump(padd+'  '), children));
+    return `${padd}<${tag}>\n${texts}${padd}</${this.type}>\n`;
+  }
 }
-
-// Text functions
-var excludeTextFrom = ['option', 'optgroup', 'textarea', 'button'];
-
-var includeText = (comp) => comp
-  && excludeTextFrom.indexOf((comp.type||'').toLowerCase()) == -1;
-
-var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
 
 // Mapping
 var mapChildren = (mapFn, comp) => {

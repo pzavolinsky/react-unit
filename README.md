@@ -111,6 +111,13 @@ Finally assert the event:
 expect(changeEvent).toBe('some event');
 ```
 
+If at any point you want to inspect the rendered component you can use:
+
+```javascript
+console.log(component.dump());
+```
+
+
 Rendering Modes
 ---------------
 

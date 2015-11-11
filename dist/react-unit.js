@@ -1,5 +1,7 @@
 'use strict';
 
+var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -10,6 +12,17 @@ var R = require('ramda');
 var sizzle = require('./sizzle-bundle');
 var React = require('react');
 var TestUtils = require('react/lib/ReactTestUtils');
+
+// Text functions
+var excludeTextFrom = ['option', 'optgroup', 'textarea', 'button'];
+
+var includeText = function includeText(comp) {
+  return comp && excludeTextFrom.indexOf((comp.type || '').toLowerCase()) == -1;
+};
+
+var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
+
+// Component wrapper
 
 var Component = (function () {
   function Component(comp, parent) {
@@ -49,7 +62,7 @@ var Component = (function () {
     };
   }
 
-  // Text functions
+  // Mapping
 
   _createClass(Component, [{
     key: 'prop',
@@ -135,20 +148,43 @@ var Component = (function () {
         console.log('Sizzle error', e.stack);throw e;
       }
     }
+  }, {
+    key: 'dump',
+    value: function dump(padd) {
+      if (!padd) padd = '';
+      var children = this.prop('children');
+      var tag = this.type + R.compose(R.join(''), R.map(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2);
+
+        var k = _ref2[0];
+        var v = _ref2[1];
+        return ' ' + k + '=\'' + v + '\'';
+      }), R.filter(function (_ref3) {
+        var _ref32 = _slicedToArray(_ref3, 2);
+
+        var _ = _ref32[0];
+        var v = _ref32[1];
+        return isText(typeof v) && (v || v === 0);
+      }), R.toPairs, R.merge({ key: this.key, ref: this.ref }), R.omit(['children']))(this.props);
+
+      if (!children || children.length === 0) {
+        return this.text ? padd + '<' + tag + '>' + this.text + '</' + this.type + '>\n' : padd + '<' + tag + ' />\n';
+      }
+
+      if (isText(typeof children)) {
+        return padd + '<' + tag + '>' + children + '</' + this.type + '>\n';
+      }
+      if (children.length === undefined) children = [children];
+      var texts = R.join('', R.map(function (c) {
+        return c.dump(padd + '  ');
+      }, children));
+      return padd + '<' + tag + '>\n' + texts + padd + '</' + this.type + '>\n';
+    }
   }]);
 
   return Component;
 })();
 
-var excludeTextFrom = ['option', 'optgroup', 'textarea', 'button'];
-
-var includeText = function includeText(comp) {
-  return comp && excludeTextFrom.indexOf((comp.type || '').toLowerCase()) == -1;
-};
-
-var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
-
-// Mapping
 var mapChildren = function mapChildren(mapFn, comp) {
   var children = [];
   var texts = [];
