@@ -62,6 +62,9 @@ class Component {
       R.map(c => c.findBy && c.findBy(fn))
     )(children);
   }
+  findByRef(ref) {
+    return this.findBy(c => c.ref == ref);
+  }
   findByTag(type) {
     return this.findBy(type == '*' ? (c => true) : (c => c.type == type));
   }
