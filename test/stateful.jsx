@@ -1,7 +1,6 @@
 // Note: you should use var createComponent = require('react-unit');
 var createComponent = require('./react-unit');
 var React = require('react');
-var R = require('ramda');
 
 var Stateful = React.createClass({
   getInitialState: function() {
@@ -12,6 +11,12 @@ var Stateful = React.createClass({
   },
   render: function() {
     return <input value={this.state.value} onChange={this.onChange} />
+  }
+});
+
+var StatefulWrapper = React.createClass({
+  render: function() {
+    return <div><Stateful {...this.props} /></div>;
   }
 });
 
@@ -26,7 +31,6 @@ var SetStateBeforeMount = React.createClass({
     return <span className="status">{this.state.mounted}</span>
   }
 });
-
 
 describe('stateful controls', () => {
   it('should handle input changes', () => {
@@ -50,41 +54,33 @@ describe('stateful controls', () => {
     expect(newInput.props.value).toEqual('new!');
   });
 
-  var setAndAssertValue = (comp, value) => {
-    var input = comp.findByQuery('input')[0];
+  it('should handle input changes in nested components', () => {
 
-    input.onChange({target:{value: value}});
+    // We will create the component in interleaved mode so that we can access
+    // the <Stateful> child component.
+    var component = createComponent.interleaved(
+      <StatefulWrapper value="original" />
+    );
 
-    var newComp = comp.renderNew();
-    var newInput = newComp.findByQuery('input')[0];
+    // You can uncomment the following line to se the result:
+    // console.log(component.dump());
 
-    expect(newInput.props.value).toEqual(value);
+    // Emit the onChange event.
+    var input = component.findByQuery('input')[0];
+    input.onChange({target:{value: 'new!'}});
 
-    return newComp;
-  }
+    // Find the Stateful component (this only works in interleaved and shallow
+    // mode, you could also try findByQuery('input') in the default mode).
+    var stateful = component.findByQuery('Stateful')[0];
+    // or var stateful = component.findByComponent(Stateful)[0];
+    // or var stateful = component.findByQuery('input')[0];
 
-  it('can be chained in deep mode', () => {
-    var component = createComponent(<Stateful value="original" />);
+    // Note that we need to call renderNew on the Stateful component
+    // and not on the root StatefulWrapper.
+    var newStateful = stateful.renderNew();
+    var newInput = newStateful.findByQuery('input')[0];
 
-    var data = ['a','b','c','d','e','f','g'];
-
-    R.reduce(setAndAssertValue, component, data);
-  });
-
-  it('can be chained in interleaved mode', () => {
-    var component = createComponent.interleaved(<Stateful value="original" />);
-
-    var data = ['a','b','c','d','e','f','g'];
-
-    R.reduce(setAndAssertValue, component, data);
-  });
-
-  it('can be chained in shallow mode', () => {
-    var component = createComponent.shallow(<Stateful value="original" />);
-
-    var data = ['a','b','c','d','e','f','g'];
-
-    R.reduce(setAndAssertValue, component, data);
+    expect(newInput.props.value).toEqual('new!');
   });
 
   xit('can set state in their componentWillMount', () => {
