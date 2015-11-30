@@ -163,7 +163,7 @@ var mapComponent = R.curry((compCtor, parent, comp) => {
   var mappedChildren = mapChildren(mapFn, newComp);
   newComp.props.children = mappedChildren.children;
   newComp.texts = mappedChildren.texts;
-  newComp.text = newComp.texts.join(' ');
+  newComp.text = newComp.texts.join('');
   return newComp;
 });
 
