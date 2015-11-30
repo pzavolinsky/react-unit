@@ -14,18 +14,25 @@ var TextsAccrossSeveralElements = React.createClass({
   }
 });
 
-describe('text should be aggregated with no extra spaces added', () => {
+describe('text', () => {
 
-  it('within a single element', () => {
+  it('returns the component text', () => {
     var component = createComponent(<TextsWithinSingleElement/>);
-    var texts = component.findByQuery('div')[0];
-    expect(texts.text).toEqual('Hello world!');
+    var div = component.findByQuery('div')[0];
+    expect(div.text).toEqual('Hello world!');
   });
 
-  it('across several elements', () => {
+  it('returns the aggregated text of the children with no extra spaces', () => {
     var component = createComponent(<TextsAccrossSeveralElements/>);
-    var texts = component.findByQuery('ul')[0];
-    expect(texts.text).toEqual('123');
-  });
+    var uls = component.findByQuery('ul')[0];
 
+    expect(uls.text).toEqual('123');
+
+    // In some scenarios you might want to assert the individual text elements
+    // in these cases you could also do:
+    expect(uls.texts.join(' ')).toEqual('1 2 3');
+
+    // or:
+    expect(uls.texts).toEqual(['1', '2', '3']);
+  });
 });
