@@ -2,20 +2,30 @@
 var createComponent = require('./react-unit');
 var React = require('react');
 
-var WithTexts = React.createClass({
+var TextsWithinSingleElement = React.createClass({
   render: function() {
     return <div>{"Hello"} {"world"}{"!"}</div>
   }
 });
 
-describe('text', () => {
+var TextsAccrossSeveralElements = React.createClass({
+  render: function() {
+    return <ul><li>1</li><li>2</li><li>3</li></ul>
+  }
+});
 
-  it('renders text by concatenating texts', () => {
-    var component = createComponent(<WithTexts/>);
+describe('text should be aggregated with no extra spaces added', () => {
 
+  it('within a single element', () => {
+    var component = createComponent(<TextsWithinSingleElement/>);
     var texts = component.findByQuery('div')[0];
-
     expect(texts.text).toEqual('Hello world!');
+  });
+
+  it('across several elements', () => {
+    var component = createComponent(<TextsAccrossSeveralElements/>);
+    var texts = component.findByQuery('ul')[0];
+    expect(texts.text).toEqual('123');
   });
 
 });
