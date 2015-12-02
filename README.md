@@ -123,13 +123,191 @@ If at any point you want to inspect the rendered component you can use:
 console.log(component.dump());
 ```
 
+API Reference
+-------------
+
+#### Creating components
+
+```javascript
+// createComponent :: ReactElement -> Component
+createComponent = (reactElement) => Component
+```
+Renders `reactElement` using the deep rendering strategy (see [Rendering Modes](#rendering-modes) for more details). Returns the rendered `Component`.
+
+This method produces a component tree that is somewhat similar to applying `ReactDOM.render`.
+
+For example:
+```javascript
+var createComponent = require('react-unit');
+var component = createComponent(<MyComponent />);
+```
+More examples in [test/create-component.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/create-component.jsx).
+
+---
+<br>
+
+```javascript
+// createComponent.shallow :: ReactElement -> Component
+createComponent.shallow = (reactElement) => Component
+```
+Renders `reactElement` using the shallow rendering strategy (see [Rendering Modes](#rendering-modes) for more details). Returns the rendered `Component`.
+
+This method produces a shallow component tree. That is, it renders the root component and all the children HTML nodes, stopping at the first child component level.
+
+For example:
+```javascript
+var createComponent = require('react-unit');
+var component = createComponent.shallow(<MyComponent />);
+```
+More examples in [test/create-component-shallow.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/create-component-shallow.jsx).
+
+---
+<br>
+
+```javascript
+// createComponent.interleaved :: ReactElement -> Component
+createComponent.interleaved = (reactElement) => Component
+```
+Renders `reactElement` using the interleaved rendering strategy (see [Rendering Modes](#rendering-modes) for more details). Returns the rendered `Component`.
+
+This method produces a component tree that interleaves react components and actual rendered components.
+
+For example:
+```javascript
+var createComponent = require('react-unit');
+var component = createComponent.interleaved(<MyComponent />);
+```
+More examples in [test/create-component-interleaved.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/create-component-interleaved.jsx).
+
+---
+<br>
+
+#### Finding components
+
+```javascript
+// findByQuery :: String -> [Component]
+component.findByQuery => (sizzleExpression) => [Components]
+```
+Returns all the descendant elements of `component` matching `sizzleExpression`.
+
+For example:
+```javascript
+var inputs = component.findByQuery('input');
+```
+More examples in [test/find-by-query.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/find-by-query.jsx).
+
+---
+<br>
+
+```javascript
+// findByComponent :: ReactElement -> [Component]
+component.findByComponent => (reactElement) => [Components]
+```
+Returns all the descendant elements of `component` of type `reactElement`. Note that `findByComponent` only works with `shallow` and `interleaved` rendering modes. See [Rendering Modes](#rendering-modes) below for more details.
+
+For example:
+```javascript
+// assuming: var MyItem = React.createClass({ ... });
+var items = component.findByComponent(MyItem);
+```
+More examples in [test/find-by-component.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/find-by-component.jsx).
+
+---
+<br>
+
+```javascript
+// findBy :: (Component -> bool) -> [Component]
+component.findBy => (fn) => [Components]
+```
+Returns all the descendant elements of `component` for whom `fn` returns `true`.
+
+For example:
+```javascript
+var moreThanTwos = component.findBy(c => c.props.value > 2);
+```
+More examples in [test/find-by.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/find-by.jsx).
+
+---
+<br>
+
+```javascript
+// findByRef :: String -> [Component]
+component.findBy => (ref) => [Components]
+```
+Returns all the descendant elements of `component` matching the `ref` attribute.
+
+For example:
+```javascript
+var allMyRefs = component.findByRef('myRef');
+```
+More examples in [test/find-by-ref.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/find-by-ref.jsx).
+
+---
+<br>
+
+#### Inspecting components
+
+```javascript
+// dump :: () -> String
+component.dump => () => String
+```
+Returns a string representation of the pseudo-HTML of the component. This method is very useful for troubleshooting broken tests.
+
+For example:
+```javascript
+var html = component.dump();
+// or
+console.log(component.dump());
+```
+
+---
+<br>
+
+```javascript
+component.texts // :: [String]
+component.text  // :: String
+```
+Return the text of all the descendant elements of `component`. `texts` is a flat array containing the texts of every descendant element in depth order. `text` behaves like `DOMNode.textContent` (i.e. `component.texts.join('')`).
+
+Some examples in [test/text.jsx](https://github.com/pzavolinsky/react-unit/blob/master/test/text.jsx).
+
+---
+<br>
+
+```javascript
+// key :: Object
+component.props
+```
+The `props` object of `component`.
+
+---
+<br>
+
+```javascript
+// key :: String
+component.key
+```
+The `key` of `component`.
+
+---
+<br>
+
+```javascript
+// ref :: String
+component.ref
+```
+The `ref` of `component`.
+
+---
+<br>
+
 
 Rendering Modes
 ---------------
 
 #### Deep rendering (default behavior)
 
-By default `react-unit` will use a deep (recursive) rendering strategy. This produces an output that is very similar to that of `React.render`.
+By default `react-unit` will use a deep (recursive) rendering strategy. This produces an output that is very similar to that of `ReactDOM.render`.
 
 For example, given:
 
