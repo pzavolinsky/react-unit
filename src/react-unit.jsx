@@ -4,11 +4,6 @@ var React = require('react');
 var TestUtils = require('react/lib/ReactTestUtils');
 
 // Text functions
-var excludeTextFrom = ['option', 'optgroup', 'textarea', 'button'];
-
-var includeText = (comp) => comp
-  && excludeTextFrom.indexOf((comp.type||'').toLowerCase()) == -1;
-
 var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
 
 // Component wrapper
@@ -135,7 +130,7 @@ var mapChildren = (mapFn, comp) => {
       else if (c) {
         var childComp = mapFn(c);
         children.push(childComp);
-        if (includeText(childComp)) {
+        if (childComp) {
             texts = texts.concat(childComp.texts);
         }
       }

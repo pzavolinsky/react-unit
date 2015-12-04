@@ -14,6 +14,12 @@ var TextsAccrossSeveralElements = React.createClass({
   }
 });
 
+var WithButton = React.createClass({
+  render: function() {
+    return <span><button>Save</button></span>
+  }
+});
+
 describe('text', () => {
 
   it('returns the component text', () => {
@@ -34,5 +40,14 @@ describe('text', () => {
 
     // or:
     expect(uls.texts).toEqual(['1', '2', '3']);
+  });
+
+  it('returns the text of children buttons', () => {
+    var component = createComponent(<WithButton/>);
+    var buttonWrapper = component.findByQuery('span')[0];
+    var button = component.findByQuery('button')[0];
+
+    expect(button.text).toEqual('Save');
+    expect(buttonWrapper.text).toEqual('Save');
   });
 });
