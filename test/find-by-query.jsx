@@ -142,7 +142,6 @@ describe('findByQuery', () => {
     // Find elements that contains
     var span = component.findByQuery('div span:contains("three")')[0];
 
-    console.log(span.textContent);
     expect(span.textContent).toEqual('three');
   });
 });
