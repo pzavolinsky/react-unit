@@ -39,7 +39,7 @@ class Component {
     this.getAttributeNode = n => {
       var prop = this.prop(n);
       return { value: prop, specified: prop !== undefined }
-    }
+    };
   }
   prop(name) { return (this.props || {})[name]; }
 
@@ -116,6 +116,26 @@ class Component {
     if (children.length === undefined) children = [ children ];
     var texts = R.join('', R.map(c => c.dump(padd+'  '), children));
     return `${padd}<${tag}>\n${texts}${padd}</${this.type}>\n`;
+  }
+
+  get children() {
+    return this.props.children;
+  }
+
+  get textContent() {
+    let text = this.text || '';
+    let children = this.children;
+
+    if (children === null || children.length === 0) return text;
+
+    if (typeof children === 'string') {
+      return children + text;
+    } else if (children.hasOwnProperty('map')) {
+      return children.map((child) => {
+        return child.textContent;
+      }).join('') + text;
+    }
+    return text;
   }
 }
 
@@ -219,7 +239,7 @@ var createComponentInterleaved = R.curry(
         (_, renderWithCtor) => comp.props.children.renderNew(renderWithCtor)
       );
       return comp;
-    }
+    };
 
     return create(ctor, createComponent(createComponentInterleaved));
   }

@@ -184,6 +184,28 @@ var Component = (function () {
       }, children));
       return padd + '<' + tag + '>\n' + texts + padd + '</' + this.type + '>\n';
     }
+  }, {
+    key: 'children',
+    get: function get() {
+      return this.props.children;
+    }
+  }, {
+    key: 'textContent',
+    get: function get() {
+      var text = this.text || '';
+      var children = this.children;
+
+      if (children === null || children.length === 0) return text;
+
+      if (typeof children === 'string') {
+        return children + text;
+      } else if (children.hasOwnProperty('map')) {
+        return children.map(function (child) {
+          return child.textContent;
+        }).join('') + text;
+      }
+      return text;
+    }
   }]);
 
   return Component;

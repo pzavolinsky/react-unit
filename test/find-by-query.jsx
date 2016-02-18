@@ -43,6 +43,11 @@ var ByRef = React.createClass({
     return <div><input {...props} ref="myRef" /></div>;
   }
 });
+var ByContains = React.createClass({
+  render: function() {
+    return <div><span>one</span><span>two</span><span>three</span></div>;
+  }
+});
 
 describe('findByQuery', () => {
   it('should find by tag name', () => {
@@ -129,5 +134,15 @@ describe('findByQuery', () => {
     var input = component.findByQuery('[ref=myRef]')[0];
 
     expect(input.props.value).toEqual('found');
+  });
+
+  it('should find by contains', () => {
+    var component = createComponent(<ByContains/>);
+
+    // Find elements that contains
+    var span = component.findByQuery('div span:contains("three")')[0];
+
+    console.log(span.textContent);
+    expect(span.textContent).toEqual('three');
   });
 });
