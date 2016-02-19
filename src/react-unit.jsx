@@ -123,19 +123,7 @@ class Component {
   }
 
   get textContent() {
-    let text = this.text || '';
-    let children = this.children;
-
-    if (children === null || children.length === 0) return text;
-
-    if (typeof children === 'string') {
-      return children + text;
-    } else if (children.hasOwnProperty('map')) {
-      return children.map((child) => {
-        return child.textContent;
-      }).join('') + text;
-    }
-    return text;
+    return this.text;
   }
 }
 
