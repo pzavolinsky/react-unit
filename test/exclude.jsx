@@ -17,15 +17,14 @@ var Items = React.createClass({
 
 describe('exclude', () => {
   it('can "skip" a component using createComponent directly', () => {
-    var component = createComponent.exclude(Item)
-      (
-        <Items>
-          <Item>1</Item>
-          <Item>2</Item>
-          <Item>3</Item>
-          <Item>4</Item>
-        </Items>
-      );
+    var component = createComponent.exclude(Item)(
+      <Items>
+        <Item>1</Item>
+        <Item>2</Item>
+        <Item>3</Item>
+        <Item>4</Item>
+      </Items>
+    );
 
     var found = component.findByQuery('span:contains(0)');
 
@@ -51,9 +50,7 @@ describe('exclude', () => {
   it('can "skip" a component using createComponent.shallow', () => {
     var component = createComponent.exclude(Item).shallow(<Item>1</Item>);
 
-    var found = component.findByQuery('span:contains(0)');
-
-    expect(found.length).toEqual(0);
+    expect(component).toEqual(null);
   });
 
   it('can "skip" a component using createComponent.interleaved', () => {
@@ -69,5 +66,18 @@ describe('exclude', () => {
     var found = component.findByQuery('span:contains(0)');
 
     expect(found.length).toEqual(0);
+  });
+
+  it('dump is correct', () => {
+    var component = createComponent.exclude(Item)(
+      <Items>
+        <Item>1</Item>
+        <Item>2</Item>
+        <Item>3</Item>
+        <Item>4</Item>
+      </Items>
+    );
+
+    expect(component.dump().replace(/[\n ]/g, '')).toEqual('<div/>');
   });
 });

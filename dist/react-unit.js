@@ -206,14 +206,16 @@ var mapChildren = function mapChildren(mapFn, comp) {
   React.Children.forEach(comp.props.children, function (c) {
     if (isText(typeof c)) texts.push(c);else if (c) {
       var childComp = mapFn(c);
-      children.push(childComp);
-      if (childComp) {
-        texts = texts.concat(childComp.texts);
+      if (childComp !== null) {
+        children.push(childComp);
+        if (childComp) {
+          texts = texts.concat(childComp.texts);
+        }
       }
     }
   });
 
-  if (children.length == 1) children = children[0];
+  if (children.length == 1 && children[0] !== null) children = children[0];
 
   return {
     children: children,
@@ -250,7 +252,7 @@ var createComponentInRenderer = R.curry(function (renderer, compCtor, parent, ct
 var createComponent = R.curry(function (compCtor, parent, ctor) {
   if (exclude.length > 0) {
     if (exclude.indexOf(ctor.type) > -1) {
-      return new Component({}, parent);
+      return null;
     }
   }
   var shallowRenderer = TestUtils.createRenderer();

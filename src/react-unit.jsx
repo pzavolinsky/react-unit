@@ -137,14 +137,16 @@ var mapChildren = (mapFn, comp) => {
       if (isText(typeof c)) texts.push(c);
       else if (c) {
         var childComp = mapFn(c);
-        children.push(childComp);
-        if (childComp) {
+        if (childComp !== null) {
+          children.push(childComp);
+          if (childComp) {
             texts = texts.concat(childComp.texts);
+          }
         }
       }
   });
 
-  if (children.length == 1) children = children[0];
+  if (children.length == 1 && children[0] !== null) children = children[0];
 
   return {
     children: children,
@@ -181,7 +183,7 @@ var createComponentInRenderer = R.curry((renderer, compCtor, parent, ctor) => {
 var createComponent = R.curry((compCtor, parent, ctor) => {
   if (exclude.length > 0) {
     if (exclude.indexOf(ctor.type) > -1) {
-      return new Component({}, parent);
+      return null;
     }
   }
   const shallowRenderer = TestUtils.createRenderer();
