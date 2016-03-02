@@ -179,6 +179,11 @@ var createComponentInRenderer = R.curry((renderer, compCtor, parent, ctor) => {
 });
 
 var createComponent = R.curry((compCtor, parent, ctor) => {
+  if (exclude.length > 0) {
+    if (exclude.indexOf(ctor.type) > -1) {
+      return new Component({}, parent);
+    }
+  }
   const shallowRenderer = TestUtils.createRenderer();
   var create = ctor => {
     var c = createComponentInRenderer(shallowRenderer, compCtor, parent, ctor);
@@ -233,8 +238,24 @@ var createComponentInterleaved = R.curry(
   }
 );
 
+let exclude = [];
+let excludeMask = (fn) => {
+  return (parent, ctor) => {
+    var results = fn.call(null, parent, ctor);
+    exclude = [];
+    return results;
+  };
+};
+
 var exportedFn = createComponentDeep(null);
 exportedFn.shallow = createComponentShallow(null);
 exportedFn.interleaved = createComponentInterleaved(null);
+exportedFn.exclude = (_exclude) => {
+  exclude = _exclude.constructor === Array ? _exclude : [_exclude];
+  var mask = excludeMask(exportedFn);
+  mask.shallow = excludeMask(exportedFn.shallow);
+  mask.interleaved = excludeMask(exportedFn.interleaved);
+  return mask;
+};
 
 module.exports = exportedFn;
