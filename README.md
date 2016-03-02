@@ -465,7 +465,8 @@ var lisaName    = component.findByQuery('Person[name=Lisa] h1')[0];
 var lisaNameAlt = lisaComp.findByQuery('h1')[0];
 ```
 
-#### Excluding components
+Excluding components
+--------------------
 
 Using `exclude` you can now leave a component out of test as if it didn't exist.
 ```jsx
