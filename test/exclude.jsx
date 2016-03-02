@@ -2,6 +2,12 @@
 var createComponent = require('./react-unit');
 var React = require('react');
 
+var SubItem = React.createClass({
+  render: function() {
+    return <i>{this.props.children}</i>
+  }
+});
+
 var Item = React.createClass({
   render: function() {
     return <span>{this.props.children}</span>
@@ -13,7 +19,6 @@ var Items = React.createClass({
     return <div>{this.props.children}</div>
   }
 });
-
 
 describe('exclude', () => {
   it('can "skip" a component using createComponent directly', () => {
@@ -64,6 +69,42 @@ describe('exclude', () => {
     );
 
     var found = component.findByQuery('span:contains(0)');
+
+    expect(found.length).toEqual(0);
+  });
+
+  it('does not affect nesting', () => {
+    var component = createComponent(
+      <Items>
+        <Item>
+          1
+          <SubItem>Hello World</SubItem>
+        </Item>
+        <Item>2</Item>
+        <Item>3</Item>
+        <Item>4</Item>
+      </Items>
+    );
+
+    var found = component.findByQuery('i:contains("Hello World")');
+
+    expect(found.length).toEqual(1);
+  });
+
+  it('can be nested and still exclude', () => {
+    var component = createComponent.exclude(SubItem)(
+      <Items>
+        <Item>
+          1
+          <SubItem>Hello World</SubItem>
+        </Item>
+        <Item>2</Item>
+        <Item>3</Item>
+        <Item>4</Item>
+      </Items>
+    );
+
+    var found = component.findByQuery('i:contains("Hello World")');
 
     expect(found.length).toEqual(0);
   });
