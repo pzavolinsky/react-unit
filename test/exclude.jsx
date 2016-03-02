@@ -109,6 +109,20 @@ describe('exclude', () => {
     expect(found.length).toEqual(0);
   });
 
+  it('can exclude multi', () => {
+    var component = createComponent.exclude([Item, SubItem])(
+      <Items>
+        <SubItem>Hello World</SubItem>
+        <Item>1</Item>
+        <Item>2</Item>
+        <Item>3</Item>
+        <Item>4</Item>
+      </Items>
+    );
+
+    expect(component.dump().replace(/[\n ]/g, '')).toEqual('<div/>');
+  });
+
   it('dump is correct', () => {
     var component = createComponent.exclude(Item)(
       <Items>
