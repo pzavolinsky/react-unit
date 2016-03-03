@@ -68,7 +68,7 @@ describe('exclude', () => {
       </Items>
     );
 
-    var found = component.findByQuery('span:contains(0)');
+    var found = component.findByQuery('span:contains(1)');
 
     expect(found.length).toEqual(0);
   });
