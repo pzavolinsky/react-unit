@@ -15,10 +15,6 @@ var document = {
 document.ownerDocument = document;
 var window = { document: document };
 
-if (!global.document) {
-	global.document = document;
-}
-
 var _ = (function() {
 	/*!
  * Sizzle CSS Selector Engine v2.2.1-pre

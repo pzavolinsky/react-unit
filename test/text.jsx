@@ -20,12 +20,13 @@ var WithButton = React.createClass({
   }
 });
 
-describe('text', () => {
+describe('text or textContent', () => {
 
   it('returns the component text', () => {
     var component = createComponent(<TextsWithinSingleElement/>);
     var div = component.findByQuery('div')[0];
     expect(div.text).toEqual('Hello world!');
+    expect(div.textContent).toEqual('Hello world!');
   });
 
   it('returns the aggregated text of the children with no extra spaces', () => {
@@ -33,6 +34,7 @@ describe('text', () => {
     var uls = component.findByQuery('ul')[0];
 
     expect(uls.text).toEqual('123');
+    expect(uls.textContent).toEqual('123');
 
     // In some scenarios you might want to assert the individual text elements
     // in these cases you could also do:
