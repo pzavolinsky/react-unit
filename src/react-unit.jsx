@@ -1,10 +1,10 @@
-var R = require('ramda');
-var sizzle = require('./sizzle-bundle');
-var React = require('react');
-var TestUtils = require('react/lib/ReactTestUtils');
+import R from 'ramda';
+import sizzle from './sizzle-bundle';
+import React from 'react';
+import TestUtils from 'react/lib/ReactTestUtils';
 
 // Text functions
-var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
+const isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
 
 // Component wrapper
 class Component {
@@ -37,14 +37,14 @@ class Component {
     this.getElementsByClassName = this.findByClassName;
     this.getAttribute = n => this.prop(n == 'class' ? 'className' : n);
     this.getAttributeNode = n => {
-      var prop = this.prop(n);
+      const prop = this.prop(n);
       return { value: prop, specified: prop !== undefined }
     };
   }
   prop(name) { return (this.props || {})[name]; }
 
   findBy(fn) {
-    var ret = [];
+    const ret = [];
     if (fn(this)) ret.push(this);
     var children = this.prop('children');
     if (!children || isText(typeof children)) return ret;
@@ -64,7 +64,7 @@ class Component {
     return this.findBy(type == '*' ? (c => true) : (c => c.type == type));
   }
   findByClassName(search) {
-    var pattern = new RegExp('(^|\\s)' + search + '(\\s|$)');
+    const pattern = new RegExp('(^|\\s)' + search + '(\\s|$)');
     return this.findBy(e => pattern.test(e.prop('className')));
   }
   findByComponent(componentClass) {
@@ -73,7 +73,7 @@ class Component {
   }
   on(event,e) {
     event = 'on'+event[0].toUpperCase()+event.slice(1);
-    var handler = this.props[event];
+    const handler = this.props[event];
     if (!handler)
       throw 'Triggered unhandled '+event+' event: '+(new Error().stack);
     return handler(e);
@@ -95,7 +95,7 @@ class Component {
   dump(padd) {
     if (!padd) padd = '';
     var children = this.prop('children');
-    var tag = this.type + R.compose(
+    const tag = this.type + R.compose(
       R.join(''),
       R.map(([k,v]) => ` ${k}='${v}'`),
       R.filter(([_,v]) => isText(typeof v) && (v || v === 0)),
@@ -114,7 +114,7 @@ class Component {
       return `${padd}<${tag}>${children}</${this.type}>\n`;
     }
     if (children.length === undefined) children = [ children ];
-    var texts = R.join('', R.map(c => c.dump(padd+'  '), children));
+    const texts = R.join('', R.map(c => c.dump(padd+'  '), children));
     return `${padd}<${tag}>\n${texts}${padd}</${this.type}>\n`;
   }
 
@@ -128,7 +128,7 @@ class Component {
 }
 
 // Mapping
-var mapChildren = (mapFn, comp) => {
+const mapChildren = (mapFn, comp) => {
   var children = [];
   var texts = [];
 
@@ -136,7 +136,7 @@ var mapChildren = (mapFn, comp) => {
     c => {
       if (isText(typeof c)) texts.push(c);
       else if (c) {
-        var childComp = mapFn(c);
+        const childComp = mapFn(c);
         if (childComp !== null) {
           children.push(childComp);
           if (childComp) {
@@ -154,18 +154,18 @@ var mapChildren = (mapFn, comp) => {
   };
 };
 
-var mapComponent = R.curry((compCtor, parent, comp) => {
+const mapComponent = R.curry((compCtor, parent, comp) => {
   if (typeof comp.type === 'function') return compCtor(parent, comp);
 
-  var newComp = new Component(comp, parent);
+  const newComp = new Component(comp, parent);
 
   if (!newComp.props) return newComp;
 
-  var oldChildren = newComp.props.children;
+  const oldChildren = newComp.props.children;
   if (!oldChildren || oldChildren.length === 0) return newComp;
 
-  var mapFn = mapComponent(compCtor, newComp);
-  var mappedChildren = mapChildren(mapFn, newComp);
+  const mapFn = mapComponent(compCtor, newComp);
+  const mappedChildren = mapChildren(mapFn, newComp);
   newComp.props.children = mappedChildren.children;
   newComp.texts = mappedChildren.texts;
   newComp.text = newComp.texts.join('');
@@ -173,20 +173,20 @@ var mapComponent = R.curry((compCtor, parent, comp) => {
 });
 
 // Ctors
-var createComponentInRenderer = R.curry((renderer, compCtor, parent, ctor) => {
+const createComponentInRenderer = R.curry((renderer, compCtor, parent, ctor) => {
   renderer.render(ctor);
-  var component = mapComponent(compCtor, parent, renderer.getRenderOutput());
+  const component = mapComponent(compCtor, parent, renderer.getRenderOutput());
   component.originalComponentInstance = ctor;
   return component;
 });
 
-var createComponent = R.curry((compCtor, parent, ctor) => {
+const createComponent = R.curry((compCtor, parent, ctor) => {
   const shallowRenderer = TestUtils.createRenderer();
-  var create = ctor => {
-    var c = createComponentInRenderer(shallowRenderer, compCtor, parent, ctor);
+  const create = ctor => {
+    const c = createComponentInRenderer(shallowRenderer, compCtor, parent, ctor);
     c.renderNew = newCtor => create(newCtor||ctor);
     return c;
-  }
+  };
   return create(ctor);
 });
 
@@ -197,17 +197,17 @@ const createComponentWithExclusion = R.curry(
 );
 
 // Default behavior: recursively call create component
-var createComponentDeep = R.curry(
+const createComponentDeep = R.curry(
   (createComponent, parent, ctor) => createComponent(
     createComponentDeep(createComponent), parent, ctor)
 );
 
 // Only process a single level of react components (honoring all the HTML
 // in-between).
-var createComponentShallow = R.curry(
+const createComponentShallow = R.curry(
   (createComponent, parent, ctor) => createComponent(
     (parent, ctor) => {
-      var comp = new Component({
+      const comp = new Component({
         type: ctor.type.displayName,
         _store: ctor._store,
         props: ctor.props
@@ -222,16 +222,16 @@ var createComponentShallow = R.curry(
 
 // Same as createComponentDeep but interleaves <MyComponent> tags, rendering
 // a pseudo-html that includes both react components and actual HTML output.
-var createComponentInterleaved = R.curry(
+const createComponentInterleaved = R.curry(
   (createComponent, parent, ctor) => {
 
     // Ctor1 -> (Comp1 -> Ctor1 -> Comp2) -> Comp1
-    var create = (ctor, childCtor) => {
-      var store = ctor._store || {};
+    const create = (ctor, childCtor) => {
+      const store = ctor._store || {};
 
-      var props = R.mergeAll([store.props, ctor.props, {}]);
+      const props = R.mergeAll([store.props, ctor.props, {}]);
 
-      var comp = new Component({
+      const comp = new Component({
         type: ctor.type.displayName,
         _store: R.merge(store, { props: props })
       }, parent);
@@ -251,7 +251,7 @@ var createComponentInterleaved = R.curry(
   }
 );
 
-var exportedFn = createComponentDeep(createComponent, null);
+const exportedFn = createComponentDeep(createComponent, null);
 exportedFn.shallow = createComponentShallow(createComponent, null);
 exportedFn.interleaved = createComponentInterleaved(createComponent, null);
 
@@ -260,7 +260,7 @@ exportedFn.exclude = (comps) => {
     ? comps
     : [ comps ];
   const create = createComponentWithExclusion(comps);
-  var fn = createComponentDeep(create, null);
+  const fn = createComponentDeep(create, null);
   fn.shallow = createComponentShallow(create, null);
   fn.interleaved = createComponentInterleaved(create, null);
   return fn;

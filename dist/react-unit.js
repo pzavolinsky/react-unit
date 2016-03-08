@@ -4,17 +4,30 @@ var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = 
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var R = require('ramda');
-var sizzle = require('./sizzle-bundle');
-var React = require('react');
-var TestUtils = require('react/lib/ReactTestUtils');
+var _ramda = require('ramda');
+
+var _ramda2 = _interopRequireDefault(_ramda);
+
+var _sizzleBundle = require('./sizzle-bundle');
+
+var _sizzleBundle2 = _interopRequireDefault(_sizzleBundle);
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactLibReactTestUtils = require('react/lib/ReactTestUtils');
+
+var _reactLibReactTestUtils2 = _interopRequireDefault(_reactLibReactTestUtils);
 
 // Text functions
-var isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));
+var isText = _ramda2['default'].compose(_ramda2['default'].not, _ramda2['default'].flip(_ramda2['default'].contains)(['object', 'function']));
 
 // Component wrapper
 
@@ -27,7 +40,7 @@ var Component = (function () {
     this.type = comp.type;
     this.key = comp.key;
     this.ref = comp.ref;
-    this.props = R.mergeAll([comp._store && comp._store.props, comp.props, {
+    this.props = _ramda2['default'].mergeAll([comp._store && comp._store.props, comp.props, {
       key: this.key,
       ref: this.ref
     }]);
@@ -75,7 +88,7 @@ var Component = (function () {
       if (!children || isText(typeof children)) return ret;
       if (children.length === undefined) children = [children];
 
-      return R.compose(R.concat(ret), R.filter(R.identity), R.flatten, R.map(function (c) {
+      return _ramda2['default'].compose(_ramda2['default'].concat(ret), _ramda2['default'].filter(_ramda2['default'].identity), _ramda2['default'].flatten, _ramda2['default'].map(function (c) {
         return c.findBy && c.findBy(fn);
       }))(children);
     }
@@ -107,7 +120,7 @@ var Component = (function () {
     key: 'findByComponent',
     value: function findByComponent(componentClass) {
       return this.findBy(function (e) {
-        return e.componentInstance && TestUtils.isElementOfType(e.componentInstance, componentClass);
+        return e.componentInstance && _reactLibReactTestUtils2['default'].isElementOfType(e.componentInstance, componentClass);
       });
     }
   }, {
@@ -131,7 +144,7 @@ var Component = (function () {
   }, {
     key: 'setValueKey',
     value: function setValueKey(n, v) {
-      this.onChange({ target: R.merge(this.props, _defineProperty({}, n, v)) });
+      this.onChange({ target: _ramda2['default'].merge(this.props, _defineProperty({}, n, v)) });
     }
   }, {
     key: 'setValue',
@@ -147,7 +160,7 @@ var Component = (function () {
     key: 'findByQuery',
     value: function findByQuery(s) {
       try {
-        return sizzle(s, this.root || this);
+        return (0, _sizzleBundle2['default'])(s, this.root || this);
       } catch (e) {
         console.log('Sizzle error', e.stack);throw e;
       }
@@ -157,19 +170,19 @@ var Component = (function () {
     value: function dump(padd) {
       if (!padd) padd = '';
       var children = this.prop('children');
-      var tag = this.type + R.compose(R.join(''), R.map(function (_ref) {
+      var tag = this.type + _ramda2['default'].compose(_ramda2['default'].join(''), _ramda2['default'].map(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2);
 
         var k = _ref2[0];
         var v = _ref2[1];
         return ' ' + k + '=\'' + v + '\'';
-      }), R.filter(function (_ref3) {
+      }), _ramda2['default'].filter(function (_ref3) {
         var _ref32 = _slicedToArray(_ref3, 2);
 
         var _ = _ref32[0];
         var v = _ref32[1];
         return isText(typeof v) && (v || v === 0);
-      }), R.toPairs, R.merge({ key: this.key, ref: this.ref }), R.omit(['children']))(this.props);
+      }), _ramda2['default'].toPairs, _ramda2['default'].merge({ key: this.key, ref: this.ref }), _ramda2['default'].omit(['children']))(this.props);
 
       if (!children || children.length === 0) {
         return this.text ? padd + '<' + tag + '>' + this.text + '</' + this.type + '>\n' : padd + '<' + tag + ' />\n';
@@ -179,7 +192,7 @@ var Component = (function () {
         return padd + '<' + tag + '>' + children + '</' + this.type + '>\n';
       }
       if (children.length === undefined) children = [children];
-      var texts = R.join('', R.map(function (c) {
+      var texts = _ramda2['default'].join('', _ramda2['default'].map(function (c) {
         return c.dump(padd + '  ');
       }, children));
       return padd + '<' + tag + '>\n' + texts + padd + '</' + this.type + '>\n';
@@ -203,7 +216,7 @@ var mapChildren = function mapChildren(mapFn, comp) {
   var children = [];
   var texts = [];
 
-  React.Children.forEach(comp.props.children, function (c) {
+  _react2['default'].Children.forEach(comp.props.children, function (c) {
     if (isText(typeof c)) texts.push(c);else if (c) {
       var childComp = mapFn(c);
       if (childComp !== null) {
@@ -223,7 +236,7 @@ var mapChildren = function mapChildren(mapFn, comp) {
   };
 };
 
-var mapComponent = R.curry(function (compCtor, parent, comp) {
+var mapComponent = _ramda2['default'].curry(function (compCtor, parent, comp) {
   if (typeof comp.type === 'function') return compCtor(parent, comp);
 
   var newComp = new Component(comp, parent);
@@ -242,15 +255,15 @@ var mapComponent = R.curry(function (compCtor, parent, comp) {
 });
 
 // Ctors
-var createComponentInRenderer = R.curry(function (renderer, compCtor, parent, ctor) {
+var createComponentInRenderer = _ramda2['default'].curry(function (renderer, compCtor, parent, ctor) {
   renderer.render(ctor);
   var component = mapComponent(compCtor, parent, renderer.getRenderOutput());
   component.originalComponentInstance = ctor;
   return component;
 });
 
-var createComponent = R.curry(function (compCtor, parent, ctor) {
-  var shallowRenderer = TestUtils.createRenderer();
+var createComponent = _ramda2['default'].curry(function (compCtor, parent, ctor) {
+  var shallowRenderer = _reactLibReactTestUtils2['default'].createRenderer();
   var create = function create(ctor) {
     var c = createComponentInRenderer(shallowRenderer, compCtor, parent, ctor);
     c.renderNew = function (newCtor) {
@@ -261,18 +274,18 @@ var createComponent = R.curry(function (compCtor, parent, ctor) {
   return create(ctor);
 });
 
-var createComponentWithExclusion = R.curry(function (exclude, compCtor, parent, ctor) {
-  return R.contains(ctor.type, exclude) ? null : createComponent(compCtor, parent, ctor);
+var createComponentWithExclusion = _ramda2['default'].curry(function (exclude, compCtor, parent, ctor) {
+  return _ramda2['default'].contains(ctor.type, exclude) ? null : createComponent(compCtor, parent, ctor);
 });
 
 // Default behavior: recursively call create component
-var createComponentDeep = R.curry(function (createComponent, parent, ctor) {
+var createComponentDeep = _ramda2['default'].curry(function (createComponent, parent, ctor) {
   return createComponent(createComponentDeep(createComponent), parent, ctor);
 });
 
 // Only process a single level of react components (honoring all the HTML
 // in-between).
-var createComponentShallow = R.curry(function (createComponent, parent, ctor) {
+var createComponentShallow = _ramda2['default'].curry(function (createComponent, parent, ctor) {
   return createComponent(function (parent, ctor) {
     var comp = new Component({
       type: ctor.type.displayName,
@@ -286,17 +299,17 @@ var createComponentShallow = R.curry(function (createComponent, parent, ctor) {
 
 // Same as createComponentDeep but interleaves <MyComponent> tags, rendering
 // a pseudo-html that includes both react components and actual HTML output.
-var createComponentInterleaved = R.curry(function (createComponent, parent, ctor) {
+var createComponentInterleaved = _ramda2['default'].curry(function (createComponent, parent, ctor) {
 
   // Ctor1 -> (Comp1 -> Ctor1 -> Comp2) -> Comp1
   var create = function create(ctor, childCtor) {
     var store = ctor._store || {};
 
-    var props = R.mergeAll([store.props, ctor.props, {}]);
+    var props = _ramda2['default'].mergeAll([store.props, ctor.props, {}]);
 
     var comp = new Component({
       type: ctor.type.displayName,
-      _store: R.merge(store, { props: props })
+      _store: _ramda2['default'].merge(store, { props: props })
     }, parent);
     comp.componentInstance = ctor;
     comp.props.children = childCtor(comp, ctor);
