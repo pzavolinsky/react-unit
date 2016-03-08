@@ -250,11 +250,6 @@ var createComponentInRenderer = R.curry(function (renderer, compCtor, parent, ct
 });
 
 var createComponent = R.curry(function (compCtor, parent, ctor) {
-  if (exclude.length > 0) {
-    if (exclude.indexOf(ctor.type) > -1) {
-      return null;
-    }
-  }
   var shallowRenderer = TestUtils.createRenderer();
   var create = function create(ctor) {
     var c = createComponentInRenderer(shallowRenderer, compCtor, parent, ctor);
@@ -266,26 +261,32 @@ var createComponent = R.curry(function (compCtor, parent, ctor) {
   return create(ctor);
 });
 
+var createComponentWithExclusion = R.curry(function (exclude, compCtor, parent, ctor) {
+  return R.contains(ctor.type, exclude) ? null : createComponent(compCtor, parent, ctor);
+});
+
 // Default behavior: recursively call create component
-var createComponentDeep = R.curry(function (parent, ctor) {
-  return createComponent(createComponentDeep, parent, ctor);
+var createComponentDeep = R.curry(function (createComponent, parent, ctor) {
+  return createComponent(createComponentDeep(createComponent), parent, ctor);
 });
 
 // Only process a single level of react components (honoring all the HTML
 // in-between).
-var createComponentShallow = createComponent(function (parent, ctor) {
-  var comp = new Component({
-    type: ctor.type.displayName,
-    _store: ctor._store,
-    props: ctor.props
-  }, parent);
-  comp.componentInstance = ctor;
-  return comp;
+var createComponentShallow = R.curry(function (createComponent, parent, ctor) {
+  return createComponent(function (parent, ctor) {
+    var comp = new Component({
+      type: ctor.type.displayName,
+      _store: ctor._store,
+      props: ctor.props
+    }, parent);
+    comp.componentInstance = ctor;
+    return comp;
+  }, parent, ctor);
 });
 
 // Same as createComponentDeep but interleaves <MyComponent> tags, rendering
 // a pseudo-html that includes both react components and actual HTML output.
-var createComponentInterleaved = R.curry(function (parent, ctor) {
+var createComponentInterleaved = R.curry(function (createComponent, parent, ctor) {
 
   // Ctor1 -> (Comp1 -> Ctor1 -> Comp2) -> Comp1
   var create = function create(ctor, childCtor) {
@@ -308,27 +309,20 @@ var createComponentInterleaved = R.curry(function (parent, ctor) {
     return comp;
   };
 
-  return create(ctor, createComponent(createComponentInterleaved));
+  return create(ctor, createComponent(createComponentInterleaved(createComponent)));
 });
 
-var exclude = [];
-var excludeMask = function excludeMask(fn) {
-  return function (parent, ctor) {
-    var results = fn.call(null, parent, ctor);
-    exclude = [];
-    return results;
-  };
-};
+var exportedFn = createComponentDeep(createComponent, null);
+exportedFn.shallow = createComponentShallow(createComponent, null);
+exportedFn.interleaved = createComponentInterleaved(createComponent, null);
 
-var exportedFn = createComponentDeep(null);
-exportedFn.shallow = createComponentShallow(null);
-exportedFn.interleaved = createComponentInterleaved(null);
-exportedFn.exclude = function (_exclude) {
-  exclude = _exclude.constructor === Array ? _exclude : [_exclude];
-  var mask = excludeMask(exportedFn);
-  mask.shallow = excludeMask(exportedFn.shallow);
-  mask.interleaved = excludeMask(exportedFn.interleaved);
-  return mask;
+exportedFn.exclude = function (comps) {
+  comps = comps.constructor === Array ? comps : [comps];
+  var create = createComponentWithExclusion(comps);
+  var fn = createComponentDeep(create, null);
+  fn.shallow = createComponentShallow(create, null);
+  fn.interleaved = createComponentInterleaved(create, null);
+  return fn;
 };
 
 module.exports = exportedFn;
