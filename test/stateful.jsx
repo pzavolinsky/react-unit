@@ -83,9 +83,7 @@ describe('stateful controls', () => {
     expect(newInput.props.value).toEqual('new!');
   });
 
-  xit('can set state in their componentWillMount', () => {
-    // Broken in 0.14 until https://github.com/facebook/react/issues/4461 is
-    // fixed
+  it('can set state in their componentWillMount', () => {
     var component = createComponent(<SetStateBeforeMount />);
 
     expect(component.findByQuery('.status')[0].text).toEqual('true');
