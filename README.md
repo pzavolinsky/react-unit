@@ -481,6 +481,20 @@ createComponent.exclude([ChildComponent1, ChildComponent2]).shallow(ParentCompon
 createComponent.exclude([ChildComponent1, ChildComponent2]).interleaved(ParentComponent);
 ```
 
+Mocking components
+--------------------
+
+Using `mock` you can now replace a component with another
+```jsx
+//single mock
+createComponent.mock(Actual, Mock)(ParentComponent);
+
+//multi mock
+createComponent
+  .mock(Actual1, Mock1)
+  .mock(Actual2, Mock2)(ParentComponent);
+```
+
 
 More info
 ---------
