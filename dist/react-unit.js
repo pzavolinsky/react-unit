@@ -278,6 +278,20 @@ var createComponentWithExclusion = _ramda2['default'].curry(function (exclude, c
   return _ramda2['default'].contains(ctor.type, exclude) ? null : createComponent(compCtor, parent, ctor);
 });
 
+var createComponentWithMock = _ramda2['default'].curry(function (actuals, mocks, compCtor, parent, ctor) {
+  var i = _ramda2['default'].indexOf(ctor.type, actuals);
+  if (i < 0) return createComponent(compCtor, parent, ctor);
+  var mock = mocks[i];
+  var comp = {
+    $$typeof: ctor.$$typeof,
+    type: mock,
+    _store: ctor._store,
+    props: ctor.props
+  };
+
+  return createComponent(compCtor, parent, comp);
+});
+
 // Default behavior: recursively call create component
 var createComponentDeep = _ramda2['default'].curry(function (createComponent, parent, ctor) {
   return createComponent(createComponentDeep(createComponent), parent, ctor);
@@ -335,6 +349,21 @@ exportedFn.exclude = function (comps) {
   var fn = createComponentDeep(create, null);
   fn.shallow = createComponentShallow(create, null);
   fn.interleaved = createComponentInterleaved(create, null);
+  return fn;
+};
+
+exportedFn.mock = function (actual, mock) {
+  var actuals = [actual];
+  var mocks = [mock];
+  var create = createComponentWithMock(actuals, mocks);
+  var fn = createComponentDeep(create, null);
+  fn.shallow = createComponentShallow(create, null);
+  fn.interleaved = createComponentInterleaved(create, null);
+  fn.mock = function (actual, mock) {
+    actuals.push(actual);
+    mocks.push(mock);
+    return fn;
+  };
   return fn;
 };
 

@@ -196,6 +196,22 @@ const createComponentWithExclusion = R.curry(
     : createComponent(compCtor, parent, ctor)
 );
 
+const createComponentWithMock = R.curry(
+  (actuals, mocks, compCtor, parent, ctor) => {
+    const i = R.indexOf(ctor.type, actuals);
+    if (i < 0) return createComponent(compCtor, parent, ctor);
+    const mock = mocks[i];
+    const comp = {
+      $$typeof: ctor.$$typeof,
+      type: mock,
+      _store: ctor._store,
+      props: ctor.props
+    };
+
+    return createComponent(compCtor, parent, comp);
+  }
+);
+
 // Default behavior: recursively call create component
 const createComponentDeep = R.curry(
   (createComponent, parent, ctor) => createComponent(
@@ -263,6 +279,21 @@ exportedFn.exclude = (comps) => {
   const fn = createComponentDeep(create, null);
   fn.shallow = createComponentShallow(create, null);
   fn.interleaved = createComponentInterleaved(create, null);
+  return fn;
+};
+
+exportedFn.mock = (actual, mock) => {
+  const actuals = [actual];
+  const mocks = [mock];
+  const create = createComponentWithMock(actuals, mocks);
+  const fn = createComponentDeep(create, null);
+  fn.shallow = createComponentShallow(create, null);
+  fn.interleaved = createComponentInterleaved(create, null);
+  fn.mock = function(actual, mock) {
+    actuals.push(actual);
+    mocks.push(mock);
+    return fn;
+  };
   return fn;
 };
 
