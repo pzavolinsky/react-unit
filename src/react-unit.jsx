@@ -1,7 +1,7 @@
 import R from 'ramda';
 import sizzle from './sizzle-bundle';
 import React from 'react';
-import TestUtils from 'react/lib/ReactTestUtils';
+import TestUtils from 'react-addons-test-utils';
 
 // Text functions
 const isText = R.compose(R.not, R.flip(R.contains)(['object', 'function']));

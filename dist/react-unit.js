@@ -22,9 +22,9 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactLibReactTestUtils = require('react/lib/ReactTestUtils');
+var _reactAddonsTestUtils = require('react-addons-test-utils');
 
-var _reactLibReactTestUtils2 = _interopRequireDefault(_reactLibReactTestUtils);
+var _reactAddonsTestUtils2 = _interopRequireDefault(_reactAddonsTestUtils);
 
 // Text functions
 var isText = _ramda2['default'].compose(_ramda2['default'].not, _ramda2['default'].flip(_ramda2['default'].contains)(['object', 'function']));
@@ -120,7 +120,7 @@ var Component = (function () {
     key: 'findByComponent',
     value: function findByComponent(componentClass) {
       return this.findBy(function (e) {
-        return e.componentInstance && _reactLibReactTestUtils2['default'].isElementOfType(e.componentInstance, componentClass);
+        return e.componentInstance && _reactAddonsTestUtils2['default'].isElementOfType(e.componentInstance, componentClass);
       });
     }
   }, {
@@ -263,7 +263,7 @@ var createComponentInRenderer = _ramda2['default'].curry(function (renderer, com
 });
 
 var createComponent = _ramda2['default'].curry(function (compCtor, parent, ctor) {
-  var shallowRenderer = _reactLibReactTestUtils2['default'].createRenderer();
+  var shallowRenderer = _reactAddonsTestUtils2['default'].createRenderer();
   var create = function create(ctor) {
     var c = createComponentInRenderer(shallowRenderer, compCtor, parent, ctor);
     c.renderNew = function (newCtor) {
