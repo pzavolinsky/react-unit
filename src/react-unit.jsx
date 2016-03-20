@@ -267,28 +267,28 @@ const createComponentInterleaved = R.curry(
   }
 );
 
-const exportedFn = createComponentDeep(createComponent, null);
-exportedFn.shallow = createComponentShallow(createComponent, null);
-exportedFn.interleaved = createComponentInterleaved(createComponent, null);
-
-exportedFn.exclude = (comps) => {
-  comps = comps.constructor === Array
-    ? comps
-    : [ comps ];
-  const create = createComponentWithExclusion(comps);
+const makeCreateComponent = create => {
   const fn = createComponentDeep(create, null);
   fn.shallow = createComponentShallow(create, null);
   fn.interleaved = createComponentInterleaved(create, null);
   return fn;
 };
 
+const exportedFn = makeCreateComponent(createComponent);
+
+exportedFn.exclude = (comps) => {
+  comps = comps.constructor === Array
+    ? comps
+    : [ comps ];
+  const create = createComponentWithExclusion(comps);
+  return makeCreateComponent(create);
+};
+
 exportedFn.mock = (actual, mock) => {
   const actuals = [actual];
   const mocks = [mock];
   const create = createComponentWithMock(actuals, mocks);
-  const fn = createComponentDeep(create, null);
-  fn.shallow = createComponentShallow(create, null);
-  fn.interleaved = createComponentInterleaved(create, null);
+  const fn = makeCreateComponent(create);
   fn.mock = function(actual, mock) {
     actuals.push(actual);
     mocks.push(mock);

@@ -339,26 +339,26 @@ var createComponentInterleaved = _ramda2['default'].curry(function (createCompon
   return create(ctor, createComponent(createComponentInterleaved(createComponent)));
 });
 
-var exportedFn = createComponentDeep(createComponent, null);
-exportedFn.shallow = createComponentShallow(createComponent, null);
-exportedFn.interleaved = createComponentInterleaved(createComponent, null);
-
-exportedFn.exclude = function (comps) {
-  comps = comps.constructor === Array ? comps : [comps];
-  var create = createComponentWithExclusion(comps);
+var makeCreateComponent = function makeCreateComponent(create) {
   var fn = createComponentDeep(create, null);
   fn.shallow = createComponentShallow(create, null);
   fn.interleaved = createComponentInterleaved(create, null);
   return fn;
 };
 
+var exportedFn = makeCreateComponent(createComponent);
+
+exportedFn.exclude = function (comps) {
+  comps = comps.constructor === Array ? comps : [comps];
+  var create = createComponentWithExclusion(comps);
+  return makeCreateComponent(create);
+};
+
 exportedFn.mock = function (actual, mock) {
   var actuals = [actual];
   var mocks = [mock];
   var create = createComponentWithMock(actuals, mocks);
-  var fn = createComponentDeep(create, null);
-  fn.shallow = createComponentShallow(create, null);
-  fn.interleaved = createComponentInterleaved(create, null);
+  var fn = makeCreateComponent(create);
   fn.mock = function (actual, mock) {
     actuals.push(actual);
     mocks.push(mock);
