@@ -127,7 +127,43 @@ class Component {
   }
 }
 
-// Mapping
+// -------------------------------------------------------------------------- //
+// Before we begin, lets define some types:
+// ReactElement   :: the result of evaluating a JSX expression, that is, calling
+//                   React.createElement(type, props, children);
+// ReactComponent :: the result of rendering a ReactElement
+// UnitComponent  :: A react-unit component (see Component above) that wraps
+//                   a ReactComponent.
+// WrapFn         = (UnitComponent -> ReactComponent -> UnitComponent)
+// CreateFn       = WrapFn -> UnitComponent -> ReactElement -> UnitComponent
+//
+
+// renderElement
+//   :: (ReactComponent -> UnitComponent)
+//   -> ReactElement
+//   -> UnitComponent
+const renderElement = (mapper, reactElement) => {
+  const shallowRenderer = TestUtils.createRenderer();
+  const create = reactElement => {
+    shallowRenderer.render(reactElement);
+    const reactComponent = shallowRenderer.getRenderOutput();
+    const unitComponent = mapper(reactComponent);
+    unitComponent.originalComponentInstance = reactElement;
+    unitComponent.renderNew = newElement => create(newElement||reactElement);
+    return unitComponent;
+  };
+  return create(reactElement);
+};
+
+
+
+// --- Mapping -------------------------------------------------------------- //
+// mapChildren
+//   :: (ReactElement | ReactComponent -> UnitComponent)
+//   -> UnitComponent
+//   -> { children :: [ UnitComponent ]
+//      , texts :: [ String ]
+//      }
 const mapChildren = (mapFn, comp) => {
   var children = [];
   var texts = [];
@@ -154,65 +190,51 @@ const mapChildren = (mapFn, comp) => {
   };
 };
 
-const mapComponent = R.curry((compCtor, parent, comp) => {
-  if (typeof comp.type === 'function') return compCtor(parent, comp);
-
-  const newComp = new Component(comp, parent);
-
-  if (!newComp.props) return newComp;
-
-  const oldChildren = newComp.props.children;
-  if (!oldChildren || oldChildren.length === 0) return newComp;
-
-  const mapFn = mapComponent(compCtor, newComp);
-  const mappedChildren = mapChildren(mapFn, newComp);
-  newComp.props.children = mappedChildren.children;
-  newComp.texts = mappedChildren.texts;
-  newComp.text = newComp.texts.join('');
-  return newComp;
-});
-
-// Ctors
-const createComponentInRenderer = R.curry((renderer, compCtor, parent, ctor) => {
-  renderer.render(ctor);
-  const component = mapComponent(compCtor, parent, renderer.getRenderOutput());
-  component.originalComponentInstance = ctor;
-  return component;
-});
-
-const createComponent = R.curry((compCtor, parent, ctor) => {
-  const shallowRenderer = TestUtils.createRenderer();
-  const create = ctor => {
-    const c = createComponentInRenderer(shallowRenderer, compCtor, parent, ctor);
-    c.renderNew = newCtor => create(newCtor||ctor);
-    return c;
-  };
-  return create(ctor);
-});
-
-const createComponentWithExclusion = R.curry(
-  (exclude, compCtor, parent, ctor) => (R.contains(ctor.type, exclude))
-    ? null
-    : createComponent(compCtor, parent, ctor)
-);
-
-const createComponentWithMock = R.curry(
-  (actuals, mocks, compCtor, parent, ctor) => {
-    const i = R.indexOf(ctor.type, actuals);
-    if (i < 0) return createComponent(compCtor, parent, ctor);
-    const mock = mocks[i];
-    const comp = {
-      $$typeof: ctor.$$typeof,
-      type: mock,
-      _store: ctor._store,
-      props: ctor.props
-    };
-
-    return createComponent(compCtor, parent, comp);
+// mapComponent
+//   :: (UnitComponent -> ReactElement -> UnitComponent) -- WrapFn
+//   -> UnitComponent
+//   -> ReactElement | ReactComponent
+//   -> UnitComponent
+const mapComponent = R.curry((compCtor, parent, item) => {
+  if (typeof item.type === 'function') {
+    // item is a ReactElement that we need to render into a UnitComponent
+    return compCtor(parent, item);
   }
-);
+
+  // item is ReactComponent that we can wrap in a UnitComponent and process
+  // its children.
+  const unitComponent = new Component(item, parent);
+
+  if (!unitComponent.props) return unitComponent;
+
+  const oldChildren = unitComponent.props.children;
+  if (!oldChildren || oldChildren.length === 0) return unitComponent;
+
+  const mapFn = mapComponent(compCtor, unitComponent);
+  const mappedChildren = mapChildren(mapFn, unitComponent);
+  unitComponent.props.children = mappedChildren.children;
+  unitComponent.texts = mappedChildren.texts;
+  unitComponent.text = unitComponent.texts.join('');
+  return unitComponent;
+});
+
+// --- Ctors ---------------------------------------------------------------- //
+// createComponent :: CreateFn
+//   :: WrapFn -- (UnitComponent -> ReactComponent -> UnitComponent)
+//   -> UnitComponent
+//   -> ReactElement
+//   -> UnitComponent
+const createComponent = R.curry((compCtor, parent, reactElement) => {
+  const mapper = mapComponent(compCtor, parent);
+  return renderElement(mapper, reactElement);
+});
 
 // Default behavior: recursively call create component
+// createComponentDeep
+//   :: CreateFn
+//   -> UnitComponent
+//   -> ReactElement
+//   -> UnitComponent
 const createComponentDeep = R.curry(
   (createComponent, parent, ctor) => createComponent(
     createComponentDeep(createComponent), parent, ctor)
@@ -220,6 +242,11 @@ const createComponentDeep = R.curry(
 
 // Only process a single level of react components (honoring all the HTML
 // in-between).
+// createComponentShallow
+//   :: CreateFn
+//   -> UnitComponent
+//   -> ReactElement
+//   -> UnitComponent
 const createComponentShallow = R.curry(
   (createComponent, parent, ctor) => createComponent(
     (parent, ctor) => {
@@ -238,6 +265,11 @@ const createComponentShallow = R.curry(
 
 // Same as createComponentDeep but interleaves <MyComponent> tags, rendering
 // a pseudo-html that includes both react components and actual HTML output.
+// createComponentInterleaved
+//   :: CreateFn
+//   -> UnitComponent
+//   -> ReactElement
+//   -> UnitComponent
 const createComponentInterleaved = R.curry(
   (createComponent, parent, ctor) => {
 
@@ -267,8 +299,13 @@ const createComponentInterleaved = R.curry(
   }
 );
 
+// makeCreateComponent
+//   :: CreateFn
+//   -> ReactElement
+//   -> UnitComponent
 const makeCreateComponent = create => {
   const fn = createComponentDeep(create, null);
+  fn.create = create;
   fn.shallow = createComponentShallow(create, null);
   fn.interleaved = createComponentInterleaved(create, null);
   return fn;
@@ -276,25 +313,38 @@ const makeCreateComponent = create => {
 
 const exportedFn = makeCreateComponent(createComponent);
 
-exportedFn.exclude = (comps) => {
-  comps = comps.constructor === Array
-    ? comps
-    : [ comps ];
-  const create = createComponentWithExclusion(comps);
-  return makeCreateComponent(create);
+
+const exclude = create => exclude => R.curry((compCtor, parent, ctor) =>
+  R.contains(
+    ctor.type,
+    exclude.constructor === Array ? exclude : [ exclude ]
+  ) ? null
+    : create(compCtor, parent, ctor)
+);
+
+const mock = create => (actual, mock) => R.curry((compCtor, parent, ctor) =>
+  create(
+    compCtor,
+    parent,
+    ctor.type != actual
+      ? ctor
+      : R.merge(ctor, { type: mock })
+  )
+);
+
+const addons = {
+  exclude,
+  mock
 };
 
-exportedFn.mock = (actual, mock) => {
-  const actuals = [actual];
-  const mocks = [mock];
-  const create = createComponentWithMock(actuals, mocks);
-  const fn = makeCreateComponent(create);
-  fn.mock = function(actual, mock) {
-    actuals.push(actual);
-    mocks.push(mock);
-    return fn;
-  };
+const applyAddons = fn => {
+  R.compose(
+    R.forEach(([k,f]) => {
+      fn[k] = R.compose(applyAddons, makeCreateComponent, f(fn.create));
+    }),
+    R.toPairs,
+  )(addons);
   return fn;
-};
+}
 
-module.exports = exportedFn;
+module.exports = applyAddons(exportedFn);

@@ -70,7 +70,9 @@ describe('mock', () => {
     var found = component.findByQuery('blink');
 
     expect(found.length).toEqual(1);
-    expect(found[0].dump().replace(/[\n ]/g, '')).toEqual('<blink><span>1</span><span>2</span><span>3</span><span>4</span></blink>');
+    expect(found[0].dump().replace(/[\n ]/g, '')).toEqual(
+      '<blink><span>1</span><span>2</span><span>3</span><span>4</span></blink>'
+    );
   });
 
   it('can mock components repeatedly', () => {
@@ -93,7 +95,31 @@ describe('mock', () => {
     expect(foundBlinks.length).toEqual(2);
     expect(foundCites.length).toEqual(2);
 
-    expect(found[0].dump().replace(/[\n ]/g, '<div><blink>1</blink><blink>2</blink><cite>3</cite><cite>4</cite></div>'))
-
+    expect(found[0].dump().replace(/[\n ]/g,
+       '<div><blink>1</blink><blink>2</blink><cite>3</cite><cite>4</cite></div>'
+     ));
   });
+
+  it('can be combined with exclude', () => {
+    var component = createComponent
+      .mock(Item, Blink)
+      .exclude(Cite)(
+        <Items>
+          <Cite>Hey</Cite>
+          <Item>1</Item>
+          <Item>2</Item>
+        </Items>
+      );
+
+    var foundBlinks = component.findByQuery('blink');
+    var foundCites = component.findByQuery('cite');
+
+    expect(foundBlinks.length).toEqual(2);
+    expect(foundCites.length).toEqual(0);
+
+    expect(component.dump().replace(/[\n ]/g,
+      '<div><blink>1</blink><blink>2</blink></div>'
+    ));
+  });
+
 });
