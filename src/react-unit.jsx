@@ -251,7 +251,7 @@ const createComponentShallow = R.curry(
   (createComponent, parent, ctor) => createComponent(
     (parent, ctor) => {
       const comp = new Component({
-        type: ctor.type.displayName,
+        type: ctor.type.displayName || ctor.type.name,
         _store: ctor._store,
         props: ctor.props
       }, parent);
@@ -280,7 +280,7 @@ const createComponentInterleaved = R.curry(
       const props = R.mergeAll([store.props, ctor.props, {}]);
 
       const comp = new Component({
-        type: ctor.type.displayName,
+        type: ctor.type.displayName || ctor.type.name,
         _store: R.merge(store, { props: props })
       }, parent);
       comp.componentInstance = ctor;
