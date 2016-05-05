@@ -331,7 +331,7 @@ var createComponentDeep = _ramda2['default'].curry(function (createComponent, pa
 var createComponentShallow = _ramda2['default'].curry(function (createComponent, parent, ctor) {
   return createComponent(function (parent, ctor) {
     var comp = new Component({
-      type: ctor.type.displayName,
+      type: ctor.type.displayName || ctor.type.name,
       _store: ctor._store,
       props: ctor.props
     }, parent);
@@ -356,7 +356,7 @@ var createComponentInterleaved = _ramda2['default'].curry(function (createCompon
     var props = _ramda2['default'].mergeAll([store.props, ctor.props, {}]);
 
     var comp = new Component({
-      type: ctor.type.displayName,
+      type: ctor.type.displayName || ctor.type.name,
       _store: _ramda2['default'].merge(store, { props: props })
     }, parent);
     comp.componentInstance = ctor;

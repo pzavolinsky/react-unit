@@ -342,7 +342,7 @@ const applyAddons = fn => {
     R.forEach(([k,f]) => {
       fn[k] = R.compose(applyAddons, makeCreateComponent, f(fn.create));
     }),
-    R.toPairs,
+    R.toPairs
   )(addons);
   return fn;
 }
