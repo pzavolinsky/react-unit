@@ -40,7 +40,39 @@ class Component {
       const prop = this.prop(n);
       return { value: prop, specified: prop !== undefined }
     };
+
+    if (!comp.hasOwnProperty('reactElement')) return;
+    if (!comp.reactElement.hasOwnProperty('type')) return;
+    if (typeof comp.reactElement.type === 'string') return;
+
+    const ReactElementType = comp.reactElement.type;
+    const eventExpression = /on[A-Z][a-z]+/;
+    for (let p in ReactElementType.prototype) {
+      if (this.hasOwnProperty(p)) continue;
+      if (this.hasOwnProperty('prototype') && this.prototype.hasOwnProperty(p)) continue;
+      if (typeof ReactElementType.prototype[p] !== 'function') continue;
+      switch (p) {
+        //React private methods
+        case 'setState':
+        case 'render':
+        case 'isMounted':
+        case 'replaceState':
+        case 'forceUpdate':
+        case 'getInitialState':
+          continue;
+        default:
+          if (eventExpression.test(p)) {
+            continue;
+          }
+
+      }
+
+      ReactElementType.prototype[p].bind(comp.reactElement);
+      this[p] = ReactElementType.prototype[p];
+    }
+
   }
+
   prop(name) { return (this.props || {})[name]; }
 
   findBy(fn) {
@@ -147,9 +179,9 @@ const renderElement = (mapper, reactElement) => {
   const create = reactElement => {
     shallowRenderer.render(reactElement);
     const reactComponent = shallowRenderer.getRenderOutput();
-    const unitComponent = mapper(reactComponent);
+    const unitComponent = mapper(Object.assign({}, reactComponent, { reactElement }));
     unitComponent.originalComponentInstance = reactElement;
-    unitComponent.renderNew = newElement => create(newElement||reactElement);
+    unitComponent.renderNew = newElement => create(newElement || reactElement);
     return unitComponent;
   };
   return create(reactElement);
@@ -345,6 +377,6 @@ const applyAddons = fn => {
     R.toPairs
   )(addons);
   return fn;
-}
+};
 
 module.exports = applyAddons(exportedFn);

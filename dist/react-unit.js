@@ -70,6 +70,36 @@ var Component = (function () {
       var prop = _this.prop(n);
       return { value: prop, specified: prop !== undefined };
     };
+
+    if (!comp.hasOwnProperty('reactElement')) return;
+    if (!comp.reactElement.hasOwnProperty('type')) return;
+    if (typeof comp.reactElement.type === 'string') return;
+
+    var ReactElementType = comp.reactElement.type;
+    var eventExpression = /on[A-Z][a-z]+/;
+    for (var p in ReactElementType.prototype) {
+      if (this.hasOwnProperty(p)) continue;
+      if (this.hasOwnProperty('prototype') && this.prototype.hasOwnProperty(p)) continue;
+      if (typeof ReactElementType.prototype[p] !== 'function') continue;
+      switch (p) {
+        //React private methods
+        case 'setState':
+        case 'render':
+        case 'isMounted':
+        case 'replaceState':
+        case 'forceUpdate':
+        case 'getInitialState':
+          continue;
+        default:
+          if (eventExpression.test(p)) {
+            continue;
+          }
+
+      }
+
+      ReactElementType.prototype[p].bind(comp.reactElement);
+      this[p] = ReactElementType.prototype[p];
+    }
   }
 
   // -------------------------------------------------------------------------- //
@@ -231,7 +261,7 @@ var renderElement = function renderElement(mapper, reactElement) {
   var create = function create(reactElement) {
     shallowRenderer.render(reactElement);
     var reactComponent = shallowRenderer.getRenderOutput();
-    var unitComponent = mapper(reactComponent);
+    var unitComponent = mapper(Object.assign({}, reactComponent, { reactElement: reactElement }));
     unitComponent.originalComponentInstance = reactElement;
     unitComponent.renderNew = function (newElement) {
       return create(newElement || reactElement);
