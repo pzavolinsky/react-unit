@@ -142,10 +142,10 @@ class Component {
 //   :: (ReactComponent -> UnitComponent)
 //   -> ReactElement
 //   -> UnitComponent
-const renderElement = (mapper, reactElement) => {
+const renderElement = (mapper, reactElement, context) => {
   const shallowRenderer = TestUtils.createRenderer();
   const create = reactElement => {
-    shallowRenderer.render(reactElement);
+    shallowRenderer.render(reactElement, context);
     const reactComponent = shallowRenderer.getRenderOutput();
     const unitComponent = mapper(reactComponent);
     unitComponent.originalComponentInstance = reactElement;
@@ -224,9 +224,9 @@ const mapComponent = R.curry((compCtor, parent, item) => {
 //   -> UnitComponent
 //   -> ReactElement
 //   -> UnitComponent
-const createComponent = R.curry((compCtor, parent, reactElement) => {
+const createComponent = R.curryN(3, (compCtor, parent, reactElement, context) => {
   const mapper = mapComponent(compCtor, parent);
-  return renderElement(mapper, reactElement);
+  return renderElement(mapper, reactElement, context);
 });
 
 // Default behavior: recursively call create component
@@ -235,9 +235,9 @@ const createComponent = R.curry((compCtor, parent, reactElement) => {
 //   -> UnitComponent
 //   -> ReactElement
 //   -> UnitComponent
-const createComponentDeep = R.curry(
-  (createComponent, parent, ctor) => createComponent(
-    createComponentDeep(createComponent), parent, ctor)
+const createComponentDeep = R.curryN(3,
+  (createComponent, parent, ctor, context) => createComponent(
+    createComponentDeep(createComponent), parent, ctor, context)
 );
 
 // Only process a single level of react components (honoring all the HTML
@@ -332,9 +332,12 @@ const mock = create => (actual, mock) => R.curry((compCtor, parent, ctor) =>
   )
 );
 
+const withContext = create => (context) => R.curry(create)(R.__, R.__, R.__, context);
+
 const addons = {
   exclude,
-  mock
+  mock,
+  withContext
 };
 
 const applyAddons = fn => {
