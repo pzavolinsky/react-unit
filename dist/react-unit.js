@@ -226,10 +226,10 @@ var Component = (function () {
   return Component;
 })();
 
-var renderElement = function renderElement(mapper, reactElement) {
+var renderElement = function renderElement(mapper, reactElement, context) {
   var shallowRenderer = _reactAddonsTestUtils2['default'].createRenderer();
   var create = function create(reactElement) {
-    shallowRenderer.render(reactElement);
+    shallowRenderer.render(reactElement, context);
     var reactComponent = shallowRenderer.getRenderOutput();
     var unitComponent = mapper(reactComponent);
     unitComponent.originalComponentInstance = reactElement;
@@ -306,9 +306,9 @@ var mapComponent = _ramda2['default'].curry(function (compCtor, parent, item) {
 //   -> UnitComponent
 //   -> ReactElement
 //   -> UnitComponent
-var createComponent = _ramda2['default'].curry(function (compCtor, parent, reactElement) {
+var createComponent = _ramda2['default'].curryN(3, function (compCtor, parent, reactElement, context) {
   var mapper = mapComponent(compCtor, parent);
-  return renderElement(mapper, reactElement);
+  return renderElement(mapper, reactElement, context);
 });
 
 // Default behavior: recursively call create component
@@ -317,8 +317,8 @@ var createComponent = _ramda2['default'].curry(function (compCtor, parent, react
 //   -> UnitComponent
 //   -> ReactElement
 //   -> UnitComponent
-var createComponentDeep = _ramda2['default'].curry(function (createComponent, parent, ctor) {
-  return createComponent(createComponentDeep(createComponent), parent, ctor);
+var createComponentDeep = _ramda2['default'].curryN(3, function (createComponent, parent, ctor, context) {
+  return createComponent(createComponentDeep(createComponent), parent, ctor, context);
 });
 
 // Only process a single level of react components (honoring all the HTML
@@ -403,9 +403,16 @@ var mock = function mock(create) {
   };
 };
 
+var withContext = function withContext(create) {
+  return function (context) {
+    return _ramda2['default'].curry(create)(_ramda2['default'].__, _ramda2['default'].__, _ramda2['default'].__, context);
+  };
+};
+
 var addons = {
   exclude: exclude,
-  mock: mock
+  mock: mock,
+  withContext: withContext
 };
 
 var applyAddons = function applyAddons(fn) {
