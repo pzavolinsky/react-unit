@@ -176,8 +176,8 @@ class Component {
 //   -> UnitComponent
 const renderElement = (mapper, reactElement) => {
   const shallowRenderer = TestUtils.createRenderer();
-  const create = reactElement => {
-    shallowRenderer.render(reactElement);
+  const create = (reactElement) => {
+    shallowRenderer.render(reactElement, reactElement.context);
     const reactComponent = shallowRenderer.getRenderOutput();
     const unitComponent = mapper(Object.assign({}, reactComponent, { reactElement }));
     unitComponent.originalComponentInstance = reactElement;
@@ -364,9 +364,38 @@ const mock = create => (actual, mock) => R.curry((compCtor, parent, ctor) =>
   )
 );
 
+const withContext = create => context => R.curry((compCtor, parent, ctor) =>
+  create(
+    compCtor,
+    parent,
+    create(compCtor, parent, {...ctor, context })
+  )
+);
+
+const fail = create => cb => R.curry((compCtor, parent, ctor) => {
+  try {
+    return create(
+      compCtor,
+      parent,
+      create(compCtor, parent, ctor)
+    )
+  } catch (e) {
+    var action = cb(e, compCtor, parent, ctor);
+    if (action === false) {
+      return null;
+    }
+    if (typeof action === 'object') {
+      return create(compCtor, parent, action);
+    }
+    throw e;
+  }
+});
+
 const addons = {
   exclude,
-  mock
+  mock,
+  withContext,
+  fail
 };
 
 const applyAddons = fn => {

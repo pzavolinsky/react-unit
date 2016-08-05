@@ -2,6 +2,8 @@
 
 var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -259,7 +261,7 @@ var Component = (function () {
 var renderElement = function renderElement(mapper, reactElement) {
   var shallowRenderer = _reactAddonsTestUtils2['default'].createRenderer();
   var create = function create(reactElement) {
-    shallowRenderer.render(reactElement);
+    shallowRenderer.render(reactElement, reactElement.context);
     var reactComponent = shallowRenderer.getRenderOutput();
     var unitComponent = mapper(Object.assign({}, reactComponent, { reactElement: reactElement }));
     unitComponent.originalComponentInstance = reactElement;
@@ -433,9 +435,38 @@ var mock = function mock(create) {
   };
 };
 
+var withContext = function withContext(create) {
+  return function (context) {
+    return _ramda2['default'].curry(function (compCtor, parent, ctor) {
+      return create(compCtor, parent, create(compCtor, parent, _extends({}, ctor, { context: context })));
+    });
+  };
+};
+
+var fail = function fail(create) {
+  return function (cb) {
+    return _ramda2['default'].curry(function (compCtor, parent, ctor) {
+      try {
+        return create(compCtor, parent, create(compCtor, parent, ctor));
+      } catch (e) {
+        var action = cb(e, compCtor, parent, ctor);
+        if (action === false) {
+          return null;
+        }
+        if (typeof action === 'object') {
+          return create(compCtor, parent, action);
+        }
+        throw e;
+      }
+    });
+  };
+};
+
 var addons = {
   exclude: exclude,
-  mock: mock
+  mock: mock,
+  withContext: withContext,
+  fail: fail
 };
 
 var applyAddons = function applyAddons(fn) {
