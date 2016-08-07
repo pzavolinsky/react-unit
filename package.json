@@ -1,6 +1,6 @@
 {
   "name": "react-unit",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Lightweight unit test library for ReactJS.",
   "main": "dist/react-unit.js",
   "scripts": {
