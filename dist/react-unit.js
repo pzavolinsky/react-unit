@@ -231,6 +231,7 @@ var renderElement = function renderElement(mapper, reactElement) {
   var create = function create(reactElement) {
     shallowRenderer.render(reactElement, reactElement.context);
     var reactComponent = shallowRenderer.getRenderOutput();
+    if (reactComponent == null) return null;
     var unitComponent = mapper(reactComponent);
     unitComponent.originalComponentInstance = reactElement;
     unitComponent.renderNew = function (newElement) {

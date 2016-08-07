@@ -24,6 +24,10 @@ var Person = React.createClass({
   }
 });
 
+var NullRender = React.createClass({
+  render: function() { return null; }
+});
+
 describe('createComponent', () => {
   it('renders recursively, erasing components', () => {
     var component = createComponent(
@@ -41,6 +45,12 @@ describe('createComponent', () => {
 
     expect(persons.length).toEqual(0);
 
+  });
+
+  it('should work with a component that renders nothing', () => {
+    var component = createComponent(<NullRender/>);
+
+    expect(component).toEqual(null);
   });
 
   it('should work with null children', () => {
