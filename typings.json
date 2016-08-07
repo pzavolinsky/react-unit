@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "ramda": "registry:npm/ramda#0.21.0+20160531162943",
+    "react": "registry:npm/react#15.0.1+20160601175240"
+  },
+  "globalDependencies": {
+    "react-addons-test-utils": "registry:dt/react-addons-test-utils#0.14.0+20160427035638"
+  }
+}

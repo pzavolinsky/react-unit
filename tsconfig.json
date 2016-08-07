@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "filesGlob": [
+    "./typings/index.d.ts",
+    "./src/**/*.ts"
+  ],
+  "atom": {
+    "rewriteTsconfig": true
+  },
+  "files": [
+    "./typings/index.d.ts",
+    "./src/mapping.ts",
+    "./src/react-unit.ts",
+    "./src/render-element.ts",
+    "./src/rendering-modes.ts",
+    "./src/sizzle-bundle.d.ts",
+    "./src/types.ts",
+    "./src/utils.ts"
+  ]
+}
