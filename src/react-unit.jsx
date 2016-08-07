@@ -40,37 +40,6 @@ class Component {
       const prop = this.prop(n);
       return { value: prop, specified: prop !== undefined }
     };
-
-    if (!comp.hasOwnProperty('reactElement')) return;
-    if (!comp.reactElement.hasOwnProperty('type')) return;
-    if (typeof comp.reactElement.type === 'string') return;
-
-    const ReactElementType = comp.reactElement.type;
-    const eventExpression = /on[A-Z][a-z]+/;
-    for (let p in ReactElementType.prototype) {
-      if (this.hasOwnProperty(p)) continue;
-      if (this.hasOwnProperty('prototype') && this.prototype.hasOwnProperty(p)) continue;
-      if (typeof ReactElementType.prototype[p] !== 'function') continue;
-      switch (p) {
-        //React private methods
-        case 'setState':
-        case 'render':
-        case 'isMounted':
-        case 'replaceState':
-        case 'forceUpdate':
-        case 'getInitialState':
-          continue;
-        default:
-          if (eventExpression.test(p)) {
-            continue;
-          }
-
-      }
-
-      ReactElementType.prototype[p].bind(comp.reactElement);
-      this[p] = ReactElementType.prototype[p];
-    }
-
   }
 
   prop(name) { return (this.props || {})[name]; }
@@ -176,10 +145,10 @@ class Component {
 //   -> UnitComponent
 const renderElement = (mapper, reactElement) => {
   const shallowRenderer = TestUtils.createRenderer();
-  const create = (reactElement) => {
+  const create = reactElement => {
     shallowRenderer.render(reactElement, reactElement.context);
     const reactComponent = shallowRenderer.getRenderOutput();
-    const unitComponent = mapper(Object.assign({}, reactComponent, { reactElement }));
+    const unitComponent = mapper(reactComponent);
     unitComponent.originalComponentInstance = reactElement;
     unitComponent.renderNew = newElement => create(newElement || reactElement);
     return unitComponent;
@@ -368,34 +337,14 @@ const withContext = create => context => R.curry((compCtor, parent, ctor) =>
   create(
     compCtor,
     parent,
-    create(compCtor, parent, {...ctor, context })
+    R.merge(ctor, { context })
   )
 );
-
-const fail = create => cb => R.curry((compCtor, parent, ctor) => {
-  try {
-    return create(
-      compCtor,
-      parent,
-      create(compCtor, parent, ctor)
-    )
-  } catch (e) {
-    var action = cb(e, compCtor, parent, ctor);
-    if (action === false) {
-      return null;
-    }
-    if (typeof action === 'object') {
-      return create(compCtor, parent, action);
-    }
-    throw e;
-  }
-});
 
 const addons = {
   exclude,
   mock,
-  withContext,
-  fail
+  withContext
 };
 
 const applyAddons = fn => {

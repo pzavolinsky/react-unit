@@ -469,6 +469,7 @@ Excluding components
 --------------------
 
 Using `exclude` you can now leave a component out of test as if it didn't exist.
+
 ```jsx
 //single component
 createComponent.exclude(ChildComponent)(ParentComponent);
@@ -482,9 +483,10 @@ createComponent.exclude([ChildComponent1, ChildComponent2]).interleaved(ParentCo
 ```
 
 Mocking components
---------------------
+------------------
 
 Using `mock` you can now replace a component with another
+
 ```jsx
 //single mock
 createComponent.mock(Actual, Mock)(ParentComponent);
@@ -493,6 +495,15 @@ createComponent.mock(Actual, Mock)(ParentComponent);
 createComponent
   .mock(Actual1, Mock1)
   .mock(Actual2, Mock2)(ParentComponent);
+```
+
+Implicit context
+----------------
+
+If you want to test components that use React's implicit [context](https://facebook.github.io/react/docs/context.html) you can pass the context to the rendered components by calling `withContext`:
+
+```jsx
+createComponent.withContext({ key: value})(<MyComponentWithContext />);
 ```
 
 
