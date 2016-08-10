@@ -53,9 +53,11 @@ describe('exclude', () => {
   });
 
   it('can "skip" a component using createComponent.shallow', () => {
-    var component = createComponent.exclude(Item).shallow(<Item>1</Item>);
+    var component = createComponent
+      .exclude(Item)
+      .shallow(<Items><Item/></Items>);
 
-    expect(component).toEqual(null);
+    expect(component.findByComponent(Item).length).toEqual(0);
   });
 
   it('can "skip" a component using createComponent.interleaved', () => {

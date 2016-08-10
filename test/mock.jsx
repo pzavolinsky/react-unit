@@ -38,6 +38,22 @@ var Cite = React.createClass({
   }
 });
 
+class Original extends React.Component {
+  render() {
+    return <span>I'm the original</span>;
+  }
+}
+class Mock extends React.Component {
+  render() {
+    return <span>I'm the mock</span>;
+  }
+}
+class Parent extends React.Component {
+  render() {
+    return <Original />;
+  }
+}
+
 describe('mock', () => {
   it('can mock components', () => {
     var component = createComponent.mock(Item, Blink)(
@@ -122,4 +138,11 @@ describe('mock', () => {
     ));
   });
 
+  xit('understands findByComponent', () => {
+    const component = createComponent
+      .mock(Original, Mock)
+      (<Parent />);
+    expect(component.findByComponent(Original).length).toBe(0);
+    expect(component.findByComponent(Mock).length).toBe(1);
+  })
 });

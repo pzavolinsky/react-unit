@@ -44,13 +44,13 @@ gulp.task('build-sizzle', function () {
 });
 
 gulp.task('build-test', ['build'], function() {
-  return gulp.src('./test/*.jsx')
+  return gulp.src('./test/**/*.jsx')
     .pipe(babel())
     .pipe(rename({prefix: 'test-'}))
     .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('test', ['build-test'], function () {
-  return gulp.src('dist/test-*.js')
+  return gulp.src('dist/**/test-*.js')
     .pipe(jasmine({verbose: true, includeStackTrace: true}));
 });

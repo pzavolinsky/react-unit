@@ -1,95 +1,60 @@
 import * as R from 'ramda';
+import { UnitComponent } from './unit-component';
 import
-  { CreateComponent
-  , ComponentConstructor
-  , ReactElement
-  , ElementType
-  , ExportedCreateComponent
-  , OptionalUnitComponent
+  { isUnknown
+  , RenderContext
+  , Resolver
+  , ResolvedComponent
+  , AddOn
+  , defaultRenderContext
   } from './types';
 import
-  { createComponent
-  , createComponentDeep
-  , createComponentShallow
-  , createComponentInterleaved
-  } from './rendering-modes';
+  { deepResolver
+  , shallowResolver
+  , interleavedResolver
+  } from './resolver';
+import { applyRootPipeline, applyComponentPipeline } from './pipeline';
+import wrapper from './wrapper';
+import addOns from './add-ons';
 
-const makeCreateComponent = (create:CreateComponent) => {
-  const fn:ExportedCreateComponent =
-    el => createComponentDeep(create)(undefined, el);
-  fn.create = create;
-  fn.shallow = el => createComponentShallow(create)(undefined, el);
-  fn.interleaved = el => createComponentInterleaved(create)(undefined, el);
+interface CreateComponentFn {
+  (instance:any):UnitComponent|any
+}
+
+interface CreateComponent extends CreateComponentFn {
+  shallow: CreateComponentFn
+  interleaved: CreateComponentFn
+  ctx: RenderContext
+}
+
+const createComponent = (
+  ctx:RenderContext,
+  resolver:Resolver
+):(instance:any) => UnitComponent|any => {
+  const rootPipeline = applyRootPipeline(ctx, resolver);
+  const componentPipeline = applyComponentPipeline(ctx, resolver);
+  function wrap(resolved:ResolvedComponent):UnitComponent|any {
+    return isUnknown(resolved)
+      ?  resolved.unknown
+      :  wrapper(undefined, resolved, c => i => wrap(componentPipeline(c)(i)));
+  }
+  return R.compose(wrap, rootPipeline);
+};
+
+const makeCreateComponent = (ctx:RenderContext) => {
+  const fn:CreateComponent = createComponent(ctx, deepResolver) as any;
+  fn.shallow = createComponent(ctx, shallowResolver);
+  fn.interleaved = createComponent(ctx, interleavedResolver);
+  fn.ctx = ctx;
   return fn;
 };
 
-const exportedFn = makeCreateComponent(createComponent);
-
-// --- Add-ons -------------------------------------------------------------- //
-// Note: an add-on is a function that takes a CreateComponent, then any args
-// you want and returns a new CreateComponent:
-//
-type AddOn = (create:CreateComponent) =>
-  (...args:any[]) =>
-    CreateComponent;
-
-const exclude:AddOn = (create:CreateComponent) =>
-  (exclude:ElementType[]|ElementType) =>  {
-    const isBlacklisted:(el:ReactElement) => boolean =
-      exclude.constructor === Array
-      ? el => R.contains(el.type, exclude as ElementType[])
-      : el => el.type == exclude;
-
-    return (
-      compCtor:ComponentConstructor,
-      parent:OptionalUnitComponent,
-      element:ReactElement
-    ) =>
-        isBlacklisted(element)
-        ? null as any // TODO: extend type interface
-        : create(compCtor, parent, element);
-};
-
-const mock:AddOn = (create:CreateComponent) =>
-  (actual:ElementType, mock:ElementType) => (
-    compCtor:ComponentConstructor,
-    parent:OptionalUnitComponent,
-    element:ReactElement
-  ) =>
-    create(
-      compCtor,
-      parent,
-      element.type != actual
-      ? element
-      : R.merge(element, { type: mock })
-    );
-
-const withContext:AddOn = (create:CreateComponent) =>
-  (context:any) => (
-    compCtor:ComponentConstructor,
-    parent:OptionalUnitComponent,
-    element:ReactElement
-  ) =>
-    create(
-      compCtor,
-      parent,
-      R.merge(element, { context })
-    );
-
-const addons:{ [index:string]:AddOn } = {
-  exclude,
-  mock,
-  withContext
-};
-
-function applyAddons(fn:any) {
-  R.compose(
-    R.forEach(([k, f]:any) => {
-      fn[k] = R.compose(applyAddons, makeCreateComponent, f(fn.create));
-    }),
-    R.toPairs
-  )(addons);
+function applyAddons(fn:CreateComponent) {
+  R.toPairs<string, AddOn>(addOns).forEach(([name, addOn]) => {
+    (fn as any)[name] =
+      R.compose(applyAddons, makeCreateComponent, addOn(fn.ctx));
+  });
   return fn;
 };
 
-export = applyAddons(exportedFn);
+export = applyAddons(makeCreateComponent(defaultRenderContext));

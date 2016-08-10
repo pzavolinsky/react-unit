@@ -1,49 +1,35 @@
 "use strict";
 var R = require('ramda');
-var rendering_modes_1 = require('./rendering-modes');
-var makeCreateComponent = function (create) {
-    var fn = function (el) { return rendering_modes_1.createComponentDeep(create)(undefined, el); };
-    fn.create = create;
-    fn.shallow = function (el) { return rendering_modes_1.createComponentShallow(create)(undefined, el); };
-    fn.interleaved = function (el) { return rendering_modes_1.createComponentInterleaved(create)(undefined, el); };
+var types_1 = require('./types');
+var resolver_1 = require('./resolver');
+var pipeline_1 = require('./pipeline');
+var wrapper_1 = require('./wrapper');
+var add_ons_1 = require('./add-ons');
+var createComponent = function (ctx, resolver) {
+    var rootPipeline = pipeline_1.applyRootPipeline(ctx, resolver);
+    var componentPipeline = pipeline_1.applyComponentPipeline(ctx, resolver);
+    function wrap(resolved) {
+        return types_1.isUnknown(resolved)
+            ? resolved.unknown
+            : wrapper_1.default(undefined, resolved, function (c) { return function (i) { return wrap(componentPipeline(c)(i)); }; });
+    }
+    return R.compose(wrap, rootPipeline);
+};
+var makeCreateComponent = function (ctx) {
+    var fn = createComponent(ctx, resolver_1.deepResolver);
+    fn.shallow = createComponent(ctx, resolver_1.shallowResolver);
+    fn.interleaved = createComponent(ctx, resolver_1.interleavedResolver);
+    fn.ctx = ctx;
     return fn;
 };
-var exportedFn = makeCreateComponent(rendering_modes_1.createComponent);
-var exclude = function (create) {
-    return function (exclude) {
-        var isBlacklisted = exclude.constructor === Array
-            ? function (el) { return R.contains(el.type, exclude); }
-            : function (el) { return el.type == exclude; };
-        return function (compCtor, parent, element) {
-            return isBlacklisted(element)
-                ? null // TODO: extend type interface
-                : create(compCtor, parent, element);
-        };
-    };
-};
-var mock = function (create) {
-    return function (actual, mock) { return function (compCtor, parent, element) {
-        return create(compCtor, parent, element.type != actual
-            ? element
-            : R.merge(element, { type: mock }));
-    }; };
-};
-var withContext = function (create) {
-    return function (context) { return function (compCtor, parent, element) {
-        return create(compCtor, parent, R.merge(element, { context: context }));
-    }; };
-};
-var addons = {
-    exclude: exclude,
-    mock: mock,
-    withContext: withContext
-};
 function applyAddons(fn) {
-    R.compose(R.forEach(function (_a) {
-        var k = _a[0], f = _a[1];
-        fn[k] = R.compose(applyAddons, makeCreateComponent, f(fn.create));
-    }), R.toPairs)(addons);
+    R.toPairs(add_ons_1.default).forEach(function (_a) {
+        var name = _a[0], addOn = _a[1];
+        fn[name] =
+            R.compose(applyAddons, makeCreateComponent, addOn(fn.ctx));
+    });
     return fn;
 }
 ;
-module.exports = applyAddons(exportedFn);
+module.exports = applyAddons(makeCreateComponent(types_1.defaultRenderContext));
+//# sourceMappingURL=react-unit.js.map

@@ -3,6 +3,7 @@
     "target": "ES5",
     "module": "commonjs",
     "outDir": "./dist",
+    "sourceMap": true,
     "noImplicitAny": true,
     "strictNullChecks": true
   },
@@ -18,12 +19,18 @@
   },
   "files": [
     "./typings/index.d.ts",
-    "./src/mapping.ts",
+    "./src/add-ons/exclude.ts",
+    "./src/add-ons/index.ts",
+    "./src/add-ons/mock.ts",
+    "./src/add-ons/with-context.ts",
+    "./src/pipeline.ts",
     "./src/react-unit.ts",
-    "./src/render-element.ts",
-    "./src/rendering-modes.ts",
+    "./src/render-instance.ts",
+    "./src/resolver.ts",
     "./src/sizzle-bundle.d.ts",
     "./src/types.ts",
-    "./src/utils.ts"
+    "./src/unit-component.ts",
+    "./src/utils.ts",
+    "./src/wrapper.ts"
   ]
 }
