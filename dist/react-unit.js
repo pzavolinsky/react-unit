@@ -32,4 +32,3 @@ function applyAddons(fn) {
 }
 ;
 module.exports = applyAddons(makeCreateComponent(types_1.defaultRenderContext));
-//# sourceMappingURL=react-unit.js.map

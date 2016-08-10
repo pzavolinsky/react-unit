@@ -10,13 +10,14 @@ import
   , RenderNew
   , isHtml
   } from './types';
+import { getTagNameForType } from './utils';
 
 // --- Rendered Component Wrapper Functions --------------------------------- //
 function wrapShallowReactComponent(
   renderOutput:any
 ):ShallowReactComponent {
   const { type } = renderOutput;
-  const tagName = type.displayName || type.name || 'anonymous-component';
+  const tagName = getTagNameForType(type);
   return {
     type: 'shallow',
     tagName,

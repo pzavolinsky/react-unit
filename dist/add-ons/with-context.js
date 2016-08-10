@@ -10,4 +10,3 @@ var withContext = function (ctx) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = withContext;
-//# sourceMappingURL=with-context.js.map

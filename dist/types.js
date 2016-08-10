@@ -16,4 +16,3 @@ exports.defaultRenderContext = ({
     componentMapper: function (c) { return c; },
     resolveMapper: function (r) { return r; }
 });
-//# sourceMappingURL=types.js.map

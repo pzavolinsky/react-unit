@@ -2,6 +2,7 @@ import { AddOn } from '../types';
 import exclude from './exclude';
 import mock from './mock';
 import withContext from './with-context';
+import debug from './debug';
 
 interface AddOnMap {
   [name:string]:AddOn
@@ -10,7 +11,8 @@ interface AddOnMap {
 const addOns:AddOnMap = {
   exclude,
   mock,
-  withContext
+  withContext,
+  debug
 };
 
 export default addOns;

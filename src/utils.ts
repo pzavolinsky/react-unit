@@ -12,6 +12,9 @@ export const isText = (v:any):v is string => !contains(typeof v, notText);
 export const isOfType = (type:any, comp:RenderedComponent):boolean =>
   (isHtml(comp) || isShallow(comp)) && isElementOfType(comp.instance, type);
 
+export const getTagNameForType = (type:any) =>
+  type.displayName || type.name || 'anonymous-component';
+
 export function filterChildren(
   fn:(c:RenderedComponent) => boolean,
   comp:RenderedComponent

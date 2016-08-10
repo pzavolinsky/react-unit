@@ -73,24 +73,6 @@ describe('mock', () => {
     expect(found1[0].dump().replace(/[\n ]/g, '')).toEqual('<blink>4</blink>');
   });
 
-  it('can mock a parent component', () => {
-    var component = createComponent.mock(Items, Blink)(
-      <Items>
-        <Item>1</Item>
-        <Item>2</Item>
-        <Item>3</Item>
-        <Item>4</Item>
-      </Items>
-    );
-
-    var found = component.findByQuery('blink');
-
-    expect(found.length).toEqual(1);
-    expect(found[0].dump().replace(/[\n ]/g, '')).toEqual(
-      '<blink><span>1</span><span>2</span><span>3</span><span>4</span></blink>'
-    );
-  });
-
   it('can mock components repeatedly', () => {
     var component = createComponent
       .mock(Item, Blink)
@@ -138,10 +120,12 @@ describe('mock', () => {
     ));
   });
 
-  xit('understands findByComponent', () => {
+  it('understands findByComponent', () => {
     const component = createComponent
       .mock(Original, Mock)
+      .interleaved
       (<Parent />);
+
     expect(component.findByComponent(Original).length).toBe(0);
     expect(component.findByComponent(Mock).length).toBe(1);
   })

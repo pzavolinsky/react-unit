@@ -7,6 +7,9 @@ exports.isText = function (v) { return !ramda_1.contains(typeof v, notText); };
 exports.isOfType = function (type, comp) {
     return (types_1.isHtml(comp) || types_1.isShallow(comp)) && react_addons_test_utils_1.isElementOfType(comp.instance, type);
 };
+exports.getTagNameForType = function (type) {
+    return type.displayName || type.name || 'anonymous-component';
+};
 function filterChildren(fn, comp) {
     return types_1.isHtml(comp)
         ? ramda_1.merge(comp, {
@@ -15,4 +18,3 @@ function filterChildren(fn, comp) {
         : comp;
 }
 exports.filterChildren = filterChildren;
-//# sourceMappingURL=utils.js.map

@@ -138,4 +138,3 @@ var UnitComponent = (function () {
     return UnitComponent;
 }());
 exports.UnitComponent = UnitComponent;
-//# sourceMappingURL=unit-component.js.map

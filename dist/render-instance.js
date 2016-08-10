@@ -3,10 +3,11 @@ var react_1 = require('react');
 var ramda_1 = require('ramda');
 var react_addons_test_utils_1 = require('react-addons-test-utils');
 var types_1 = require('./types');
+var utils_1 = require('./utils');
 // --- Rendered Component Wrapper Functions --------------------------------- //
 function wrapShallowReactComponent(renderOutput) {
     var type = renderOutput.type;
-    var tagName = type.displayName || type.name || 'anonymous-component';
+    var tagName = utils_1.getTagNameForType(type);
     return {
         type: 'shallow',
         tagName: tagName,
@@ -89,4 +90,3 @@ var renderInstance = function (instance) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = renderInstance;
-//# sourceMappingURL=render-instance.js.map

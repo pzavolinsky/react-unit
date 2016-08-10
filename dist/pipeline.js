@@ -39,4 +39,3 @@ exports.applyComponentPipeline = function (ctx, resolver) {
         ctx.instanceMapper);
     };
 };
-//# sourceMappingURL=pipeline.js.map
