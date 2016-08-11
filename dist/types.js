@@ -1,4 +1,17 @@
+// The goal of react-unit is to process react `instances` and turn them into
+// `UnitComponents`. So, when all is said and done,react-unit looks like:
+//
+// function createComponent(instance:ReactInstance):UnitComponent;
+//
+// UnitComponent is a bit complex and deserves a whole file, see
+// `unit-component.ts`.
 "use strict";
+exports.defaultRenderContext = ({
+    instanceMapper: function (i) { return i; },
+    componentMapper: function (c) { return c; },
+    resolveMapper: function (r) { return r; }
+});
+// === Type guards ========================================================== //
 exports.isShallow = function (c) {
     return c.type === 'shallow';
 };
@@ -11,8 +24,3 @@ exports.isArtificialHtml = function (c) {
 exports.isUnknown = function (c) {
     return c.type === 'unknown';
 };
-exports.defaultRenderContext = ({
-    instanceMapper: function (i) { return i; },
-    componentMapper: function (c) { return c; },
-    resolveMapper: function (r) { return r; }
-});

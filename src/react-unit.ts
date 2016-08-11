@@ -1,12 +1,13 @@
 import * as R from 'ramda';
 import { UnitComponent } from './unit-component';
 import
-  { isUnknown
+  { ReactInstance
   , RenderContext
   , Resolver
   , ResolvedComponent
   , AddOn
   , defaultRenderContext
+  , isUnknown
   } from './types';
 import
   { deepResolver
@@ -18,7 +19,7 @@ import wrapper from './wrapper';
 import addOns from './add-ons';
 
 interface CreateComponentFn {
-  (instance:any):UnitComponent|any
+  (instance:ReactInstance):UnitComponent|any
 }
 
 interface CreateComponent extends CreateComponentFn {
@@ -30,14 +31,17 @@ interface CreateComponent extends CreateComponentFn {
 const createComponent = (
   ctx:RenderContext,
   resolver:Resolver
-):(instance:any) => UnitComponent|any => {
+):(instance:ReactInstance) => UnitComponent|any => {
+
   const rootPipeline = applyRootPipeline(ctx, resolver);
   const componentPipeline = applyComponentPipeline(ctx, resolver);
+
   function wrap(resolved:ResolvedComponent):UnitComponent|any {
     return isUnknown(resolved)
       ?  resolved.unknown
       :  wrapper(undefined, resolved, c => i => wrap(componentPipeline(c)(i)));
   }
+
   return R.compose(wrap, rootPipeline);
 };
 

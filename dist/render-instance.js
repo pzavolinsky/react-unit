@@ -68,7 +68,7 @@ function processRenderOutput(renderNew, renderOutput, instance) {
 exports.toArtificialHtml = function (comp, child) {
     return ({
         type: 'artificial',
-        tagName: comp.instance.type.displayName || comp.instance.type.name,
+        tagName: utils_1.getTagNameForType(comp.instance.type),
         props: getPropsForOutput(comp.instance),
         renderOutput: comp.instance,
         instance: comp.instance,

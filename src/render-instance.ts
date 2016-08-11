@@ -2,7 +2,8 @@ import { Children } from 'react';
 import { mergeAll } from 'ramda';
 import { createRenderer } from 'react-addons-test-utils';
 import
-  { RenderedComponent
+  { ReactInstance
+  , RenderedComponent
   , ShallowReactComponent
   , RenderedHtmlComponent
   , ArtificialHtmlComponent
@@ -40,7 +41,7 @@ const getPropsForOutput = (
 function wrapHtmlComponent(
   renderNew:RenderNew,
   renderOutput:any,
-  instance:any
+  instance:ReactInstance
 ):RenderedHtmlComponent {
   const { type, key, ref } = renderOutput;
   const props = getPropsForOutput(renderOutput);
@@ -105,7 +106,7 @@ export const toArtificialHtml = (
   child?:RenderedComponent
 ):ArtificialHtmlComponent => ({
   type:         'artificial',
-  tagName:      comp.instance.type.displayName || comp.instance.type.name,
+  tagName:      getTagNameForType(comp.instance.type),
   props:        getPropsForOutput(comp.instance),
   renderOutput: comp.instance,
   instance:     comp.instance,
@@ -113,13 +114,18 @@ export const toArtificialHtml = (
   renderNew:    child && isHtml(child) ? child.renderNew : undefined
 });
 
-const renderInstance = (instance:any):RenderedComponent => {
+const renderInstance = (instance:ReactInstance):RenderedComponent => {
+
   const shallowRenderer = createRenderer();
-  function create(componentInstance:any):RenderedComponent {
+
+  function create(componentInstance:ReactInstance):RenderedComponent {
+
     shallowRenderer.render(componentInstance, componentInstance.context);
+
     const renderOutput = shallowRenderer.getRenderOutput();
-    const renderNew = (newInstance:any) =>
+    const renderNew = (newInstance?:ReactInstance) =>
       create(newInstance || componentInstance);
+
     return processRenderOutput(renderNew, renderOutput, componentInstance);
   }
   return create(instance);

@@ -24,7 +24,7 @@ exports.applyRootPipeline = function (ctx, resolver) {
     ctx.instanceMapper);
 };
 var failShallowArtificial = function (comp) {
-    return function (instance) {
+    return function (_) {
         throw "\n      Cannot call renderNew on shallow rendered component " + comp.tagName + ".\n\n      Looks like you are trying test <Parent><Stateful /></Parent> using\n      shallow render.\n\n      Consider using another rendering mode (e.g. interleaved) or refactoring\n      the test to do a shallow stateless test of <Parent /> and a shallow\n      stateful test of <Stateful />;\n    ";
     };
 };

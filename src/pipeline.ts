@@ -3,6 +3,7 @@ import
   { RenderContext
   , Resolver
   , HtmlComponent
+  , ReactInstance
   } from './types';
 import renderInstance from './render-instance';
 
@@ -36,7 +37,7 @@ export const applyRootPipeline = (ctx:RenderContext, resolver:Resolver) =>
   );
 
 const failShallowArtificial = (comp:HtmlComponent) =>
-  (instance:any) => {
+  (_:ReactInstance) => {
     throw `
       Cannot call renderNew on shallow rendered component ${comp.tagName}.
 

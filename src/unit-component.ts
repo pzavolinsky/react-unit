@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { HtmlComponent, isArtificialHtml } from './types';
+import { ReactInstance, HtmlComponent, isArtificialHtml } from './types';
 import { isText, isOfType } from './utils';
 import sizzle = require('./sizzle-bundle');
 
@@ -10,7 +10,7 @@ const ROOT:Root = 'root';
 const isNotRoot = (c:UnitComponent|Root):c is UnitComponent => c !== ROOT;
 
 export interface RenderNewUnit {
-  (instance:any):UnitComponent
+  (instance:ReactInstance):UnitComponent
 }
 
 // Component wrapper
