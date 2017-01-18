@@ -1,9 +1,9 @@
 "use strict";
-var react_1 = require('react');
-var ramda_1 = require('ramda');
-var react_addons_test_utils_1 = require('react-addons-test-utils');
-var types_1 = require('./types');
-var utils_1 = require('./utils');
+var react_1 = require("react");
+var ramda_1 = require("ramda");
+var react_addons_test_utils_1 = require("react-addons-test-utils");
+var types_1 = require("./types");
+var utils_1 = require("./utils");
 // --- Rendered Component Wrapper Functions --------------------------------- //
 function wrapShallowReactComponent(renderOutput) {
     var type = renderOutput.type;
@@ -16,7 +16,8 @@ function wrapShallowReactComponent(renderOutput) {
 }
 ;
 var getPropsForOutput = function (_a) {
-    var key = _a.key, ref = _a.ref, props = _a.props, _store = _a._store;
+    var key = _a.key, ref = _a.ref, props = _a.props, _store = _a._store // tslint:disable-line
+    ;
     return ramda_1.mergeAll([
         _store && _store.props,
         props,
@@ -65,17 +66,15 @@ function processRenderOutput(renderNew, renderOutput, instance) {
     return wrapUnknownComponent(renderOutput);
 }
 // --- Public API ----------------------------------------------------------- //
-exports.toArtificialHtml = function (comp, child) {
-    return ({
-        type: 'artificial',
-        tagName: utils_1.getTagNameForType(comp.instance.type),
-        props: getPropsForOutput(comp.instance),
-        renderOutput: comp.instance,
-        instance: comp.instance,
-        children: child ? [child] : [],
-        renderNew: child && types_1.isHtml(child) ? child.renderNew : undefined
-    });
-};
+exports.toArtificialHtml = function (comp, child) { return ({
+    type: 'artificial',
+    tagName: utils_1.getTagNameForType(comp.instance.type),
+    props: getPropsForOutput(comp.instance),
+    renderOutput: comp.instance,
+    instance: comp.instance,
+    children: child ? [child] : [],
+    renderNew: child && types_1.isHtml(child) ? child.renderNew : undefined
+}); };
 var renderInstance = function (instance) {
     var shallowRenderer = react_addons_test_utils_1.createRenderer();
     function create(componentInstance) {

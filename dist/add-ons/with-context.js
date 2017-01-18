@@ -1,5 +1,5 @@
 "use strict";
-var ramda_1 = require('ramda');
+var ramda_1 = require("ramda");
 var withContextMapper = function (context) {
     return function (instance) { return ramda_1.merge(instance, { context: context }); };
 };

@@ -1,8 +1,8 @@
 "use strict";
-var R = require('ramda');
-var types_1 = require('./types');
-var utils_1 = require('./utils');
-var sizzle = require('./sizzle-bundle');
+var R = require("ramda");
+var types_1 = require("./types");
+var utils_1 = require("./utils");
+var sizzle = require("./sizzle-bundle");
 var ROOT = 'root';
 var isNotRoot = function (c) { return c !== ROOT; };
 // Component wrapper
@@ -86,10 +86,10 @@ var UnitComponent = (function () {
         var children = this.prop('children');
         var tag = this.type + R.compose(R.join(''), R.map(function (_a) {
             var k = _a[0], v = _a[1];
-            return (" " + k + "='" + v + "'");
+            return " " + k + "='" + v + "'";
         }), R.filter(function (_a) {
             var _ = _a[0], v = _a[1];
-            return utils_1.isText(v) && (v || v === 0);
+            return utils_1.isText(v) && (!!v || v === 0);
         }), R.toPairs, R.merge({ key: this.key, ref: this.ref }), R.omit(['children']))(this.props);
         if (!children || children.length === 0) {
             return this.text

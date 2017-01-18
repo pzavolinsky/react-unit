@@ -1,5 +1,5 @@
 "use strict";
-var ramda_1 = require('ramda');
+var ramda_1 = require("ramda");
 var instanceLogger = function (instance) {
     console.log('[instance]', instance);
     return instance;

@@ -114,7 +114,7 @@ export class UnitComponent {
     const tag = this.type + R.compose(
       R.join(''),
       R.map(([k, v]:[any, any]) => ` ${k}='${v}'`),
-      R.filter(([_, v]:[any, any]) => isText(v) && (v || v === 0)),
+      R.filter(([_, v]:[any, any]) => isText(v) && (!!v || (v as any) === 0)),
       R.toPairs,
       R.merge({ key: this.key, ref: this.ref }),
       R.omit(['children'])

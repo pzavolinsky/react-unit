@@ -1,6 +1,6 @@
 {
   "name": "react-unit",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Lightweight unit test library for ReactJS.",
   "main": "dist/react-unit.js",
   "scripts": {
@@ -39,6 +39,7 @@
   "dependencies": {
     "ramda": "^0.17.1",
     "react": ">=0.13.3 <16.0.0",
-    "react-addons-test-utils": ">=0.13.3 <16.0.0"
+    "react-addons-test-utils": ">=0.13.3 <16.0.0",
+    "react-dom": ">=0.13.3 <16.0.0"
   }
 }

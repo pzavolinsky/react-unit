@@ -1,7 +1,7 @@
 "use strict";
-var ramda_1 = require('ramda');
-var types_1 = require('../types');
-var utils_1 = require('../utils');
+var ramda_1 = require("ramda");
+var types_1 = require("../types");
+var utils_1 = require("../utils");
 var mockMapper = function (actual, mock) {
     return function (comp) {
         return types_1.isShallow(comp) && utils_1.isOfType(actual, comp)

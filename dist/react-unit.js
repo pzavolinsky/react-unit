@@ -1,10 +1,10 @@
 "use strict";
-var R = require('ramda');
-var types_1 = require('./types');
-var resolver_1 = require('./resolver');
-var pipeline_1 = require('./pipeline');
-var wrapper_1 = require('./wrapper');
-var add_ons_1 = require('./add-ons');
+var R = require("ramda");
+var types_1 = require("./types");
+var resolver_1 = require("./resolver");
+var pipeline_1 = require("./pipeline");
+var wrapper_1 = require("./wrapper");
+var add_ons_1 = require("./add-ons");
 var createComponent = function (ctx, resolver) {
     var rootPipeline = pipeline_1.applyRootPipeline(ctx, resolver);
     var componentPipeline = pipeline_1.applyComponentPipeline(ctx, resolver);

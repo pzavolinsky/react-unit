@@ -1,6 +1,6 @@
 "use strict";
-var ramda_1 = require('ramda');
-var utils_1 = require('../utils');
+var ramda_1 = require("ramda");
+var utils_1 = require("../utils");
 var excludeMapper = function (exclude) {
     var allowed = exclude.constructor === Array
         ? function (comp) { return !ramda_1.any(function (t) { return utils_1.isOfType(t, comp); }, exclude); }

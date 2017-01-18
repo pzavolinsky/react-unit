@@ -1,7 +1,7 @@
 "use strict";
-var ramda_1 = require('ramda');
-var react_addons_test_utils_1 = require('react-addons-test-utils');
-var types_1 = require('./types');
+var ramda_1 = require("ramda");
+var react_addons_test_utils_1 = require("react-addons-test-utils");
+var types_1 = require("./types");
 var notText = ['object', 'function'];
 exports.isText = function (v) { return !ramda_1.contains(typeof v, notText); };
 exports.isOfType = function (type, comp) {

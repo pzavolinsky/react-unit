@@ -1,6 +1,6 @@
 "use strict";
-var types_1 = require('./types');
-var unit_component_1 = require('./unit-component');
+var types_1 = require("./types");
+var unit_component_1 = require("./unit-component");
 function wrapRenderedIntoUnitComponent(parent, htmlComponent, componentPipeline) {
     var unitComponent = new unit_component_1.UnitComponent(htmlComponent, parent, componentPipeline(htmlComponent));
     var children = [];

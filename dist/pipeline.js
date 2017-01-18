@@ -1,6 +1,6 @@
 "use strict";
-var ramda_1 = require('ramda');
-var render_instance_1 = require('./render-instance');
+var ramda_1 = require("ramda");
+var render_instance_1 = require("./render-instance");
 var resolveAndMap = function (ctx, resolver) {
     var mapAndRender = ramda_1.compose(render_instance_1.default, ctx.instanceMapper);
     var resolve = resolver(ctx.componentMapper, mapAndRender);

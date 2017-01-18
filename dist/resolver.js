@@ -1,7 +1,7 @@
 "use strict";
-var ramda_1 = require('ramda');
-var render_instance_1 = require('./render-instance');
-var types_1 = require('./types');
+var ramda_1 = require("ramda");
+var render_instance_1 = require("./render-instance");
+var types_1 = require("./types");
 function deepResolver(mapper, renderer) {
     return function (comp) {
         var resolve = deepResolver(mapper, renderer);
