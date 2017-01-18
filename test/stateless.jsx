@@ -36,7 +36,7 @@ describe('stateless components', () => {
     const input = border.findByQuery('input')[0];
 
     // Assert props
-    expect(border).not.toBeUndefined();
+    expect(input).not.toBeUndefined();
   });
 
   it('can handle events', () => {
