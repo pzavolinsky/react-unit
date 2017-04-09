@@ -7,23 +7,19 @@
     "noImplicitAny": true,
     "strictNullChecks": true
   },
-  "exclude": [
-    "node_modules"
-  ],
   "filesGlob": [
-    "./typings/index.d.ts",
     "./src/**/*.ts"
   ],
   "atom": {
     "rewriteTsconfig": true
   },
   "files": [
-    "./typings/index.d.ts",
     "./src/add-ons/debug.ts",
     "./src/add-ons/exclude.ts",
     "./src/add-ons/index.ts",
     "./src/add-ons/mock.ts",
     "./src/add-ons/with-context.ts",
+    "./src/defs.d.ts",
     "./src/pipeline.ts",
     "./src/react-unit.ts",
     "./src/render-instance.ts",

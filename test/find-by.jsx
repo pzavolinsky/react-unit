@@ -1,24 +1,21 @@
-// Note: you should use var createComponent = require('react-unit');
-var createComponent = require('./react-unit');
-var React = require('react');
+// Note: you should use const createComponent = require('react-unit');
+const createComponent = require('./react-unit');
+const React = require('react');
 
-var Bouviers = React.createClass({
-  render: function() {
-    return <div name="Jacqueline Bouvier">
-      <div name="Marge Bouvier">
-        <div name="Lisa Simpson" />
-      </div>
-      <input name="Patty Bouvier" />
+const Bouviers = () =>
+  <div name="Jacqueline Bouvier">
+    <div name="Marge Bouvier">
+      <div name="Lisa Simpson" />
     </div>
-  }
-});
+    <input name="Patty Bouvier" />
+  </div>;
 
 describe('findBy', () => {
   it('can be used to find everything in depth order', () => {
-    var component = createComponent(<Bouviers/>);
+    const component = createComponent(<Bouviers/>);
 
     // Find everything
-    var everything = component.findBy(t => true);
+    const everything = component.findBy(t => true);
 
     expect(everything.length).toEqual(4);
     expect(everything[0].props.name).toEqual('Jacqueline Bouvier');
@@ -28,11 +25,11 @@ describe('findBy', () => {
   });
 
   it('can be used with a filter function', () => {
-    var component = createComponent(<Bouviers/>);
+    const component = createComponent(<Bouviers/>);
 
     // Find Bouviers
-    var isBouvier = t => t.props.name.indexOf('Bouvier') != -1;
-    var bouviers = component.findBy(isBouvier);
+    const isBouvier = t => t.props.name.indexOf('Bouvier') != -1;
+    const bouviers = component.findBy(isBouvier);
 
     expect(bouviers.length).toEqual(3);
     expect(bouviers[0].props.name).toEqual('Jacqueline Bouvier');

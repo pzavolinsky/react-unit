@@ -1,6 +1,7 @@
 // Note: you should use: import createComponent from 'react-unit';
 import createComponent from './react-unit';
-import * as React from 'react';
+const React = require('react');
+import { string } from 'prop-types';
 
 class Echo extends React.Component {
   constructor(props, ctx) {
@@ -11,17 +12,16 @@ class Echo extends React.Component {
   }
 }
 Echo.contextTypes = {
-  text: React.PropTypes.string
+  text: string
 }
 
-const Child = React.createClass({
-  render: function() {
+class Child extends React.Component {
+  render() {
     return <span>{this.context && this.context.value || 'no-context'}</span>;
   }
-});
-
+}
 Child.contextTypes = {
-  value: React.PropTypes.string
+  value: string
 };
 
 const Parent = () =>

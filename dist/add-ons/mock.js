@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ramda_1 = require("ramda");
 var types_1 = require("../types");
 var utils_1 = require("../utils");
@@ -17,5 +18,4 @@ var mock = function (ctx) {
         componentMapper: ramda_1.compose(mockMapper(actual, mock), ctx.componentMapper)
     }); };
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = mock;

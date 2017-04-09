@@ -1,73 +1,64 @@
-// Note: you should use var createComponent = require('react-unit');
-var createComponent = require('./react-unit');
-var React = require('react');
+// Note: you should use const createComponent = require('react-unit');
+const createComponent = require('./react-unit');
+const React = require('react');
 
-var WithNullChildren = React.createClass({
-  render: function() {
-    var nullChild;
-    return <ul>
-      <li>first child</li>
-      {nullChild}
-      <li>other child</li>
-    </ul>
-  }
-});
+const WithNullChildren = () =>
+  <ul>
+    <li>first child</li>
+    {undefined}
+    <li>other child</li>
+  </ul>;
 
-var WithChildren = React.createClass({
-  render: function() { return <div>{this.props.child}</div> }
-});
+const WithChildren = ({ child }) => <div>{child}</div>;
 
-var Person = React.createClass({
-  render: function() {
-    var children = React.Children.map(this.props.children, (c,i) => <li key={i}>{c}</li>);
-    return <div><h1>{this.props.name}</h1><ul>{children}</ul></div>
-  }
-});
+const Person = ({ name,children }) =>
+  <div>
+      <h1>{name}</h1>
+      <ul>{React.Children.map(children, (c,i) => <li key={i}>{c}</li>)}</ul>
+  </div>;
 
-var NullRender = React.createClass({
-  render: function() { return null; }
-});
+const NullRender = () => null;
 
 describe('createComponent', () => {
   it('renders recursively, erasing components', () => {
-    var component = createComponent(
+    const component = createComponent(
       <Person name="Homer">
         <Person name="Bart"/>
         <Person name="Lisa" />
         <Person name="Maggie" />
       </Person>);
 
-    var lisa = component.findByQuery('div > ul > li > div > h1')[1];
+    const lisa = component.findByQuery('div > ul > li > div > h1')[1];
 
     expect(lisa.text).toEqual('Lisa');
 
-    var persons = component.findByQuery('Person');
+    const persons = component.findByQuery('Person');
 
     expect(persons.length).toEqual(0);
 
   });
 
   it('should work with a component that renders nothing', () => {
-    var component = createComponent(<NullRender/>);
+    const component = createComponent(<NullRender/>);
 
     expect(component).toEqual(null);
   });
 
   it('should work with null children', () => {
-    var component = createComponent(<WithNullChildren/>);
+    const component = createComponent(<WithNullChildren/>);
 
-    var lis = component.findByQuery('li');
+    const lis = component.findByQuery('li');
 
     expect(lis.length).toEqual(2);
   });
 
   it('should load numeric children', () => {
-    var component = createComponent(<WithChildren child={1}/>);
+    const component = createComponent(<WithChildren child={1}/>);
     expect(component.text).toEqual('1');
   });
 
   it('should load text children', () => {
-    var component = createComponent(<WithChildren child={'hey!'}/>);
+    const component = createComponent(<WithChildren child={'hey!'}/>);
     expect(component.text).toEqual('hey!');
   });
 });

@@ -1,21 +1,18 @@
-// Note: you should use var createComponent = require('react-unit');
-var createComponent = require('./react-unit');
-var React = require('react');
+// Note: you should use const createComponent = require('react-unit');
+const createComponent = require('./react-unit');
+const React = require('react');
 
-var Bouviers = React.createClass({
-  render: function() {
-    return <div name="Jacqueline Bouvier" ref="bouvier">
-      <div name="Marge Bouvier" ref="bouvier">
-        <div name="Lisa Simpson" ref="simpson" />
-      </div>
-      <input name="Patty Bouvier" ref="bouvier" />
+const Bouviers = () =>
+  <div name="Jacqueline Bouvier" ref="bouvier">
+    <div name="Marge Bouvier" ref="bouvier">
+      <div name="Lisa Simpson" ref="simpson" />
     </div>
-  }
-});
+    <input name="Patty Bouvier" ref="bouvier" />
+  </div>;
 
 describe('findByRef', () => {
   it('should call the findBy method', () => {
-    var component = createComponent(<Bouviers/>);
+    const component = createComponent(<Bouviers/>);
     spyOn(component, 'findBy');
     component.findByRef('myRef');
 
@@ -23,9 +20,9 @@ describe('findByRef', () => {
   });
 
   it('should find by ref attribute', () => {
-    var component = createComponent(<Bouviers/>);
-    var bouviers = component.findByRef('bouvier');
-    var simpsons = component.findByRef('simpson');
+    const component = createComponent(<Bouviers/>);
+    const bouviers = component.findByRef('bouvier');
+    const simpsons = component.findByRef('simpson');
 
     expect(bouviers.length).toEqual(3);
     expect(simpsons.length).toEqual(1);

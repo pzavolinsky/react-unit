@@ -1,11 +1,12 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ramda_1 = require("ramda");
-var react_addons_test_utils_1 = require("react-addons-test-utils");
+var test_utils_1 = require("react-dom/test-utils");
 var types_1 = require("./types");
 var notText = ['object', 'function'];
 exports.isText = function (v) { return !ramda_1.contains(typeof v, notText); };
 exports.isOfType = function (type, comp) {
-    return (types_1.isHtml(comp) || types_1.isShallow(comp)) && react_addons_test_utils_1.isElementOfType(comp.instance, type);
+    return (types_1.isHtml(comp) || types_1.isShallow(comp)) && test_utils_1.isElementOfType(comp.instance, type);
 };
 exports.getTagNameForType = function (type) {
     return type.displayName || type.name || 'anonymous-component';

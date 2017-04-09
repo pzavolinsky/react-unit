@@ -1,7 +1,8 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = require("react");
 var ramda_1 = require("ramda");
-var react_addons_test_utils_1 = require("react-addons-test-utils");
+var ReactShallowRenderer = require("react-test-renderer/shallow");
 var types_1 = require("./types");
 var utils_1 = require("./utils");
 // --- Rendered Component Wrapper Functions --------------------------------- //
@@ -76,7 +77,7 @@ exports.toArtificialHtml = function (comp, child) { return ({
     renderNew: child && types_1.isHtml(child) ? child.renderNew : undefined
 }); };
 var renderInstance = function (instance) {
-    var shallowRenderer = react_addons_test_utils_1.createRenderer();
+    var shallowRenderer = new ReactShallowRenderer();
     function create(componentInstance) {
         shallowRenderer.render(componentInstance, componentInstance.context);
         var renderOutput = shallowRenderer.getRenderOutput();
@@ -87,5 +88,4 @@ var renderInstance = function (instance) {
     }
     return create(instance);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = renderInstance;

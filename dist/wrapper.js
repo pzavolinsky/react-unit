@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var types_1 = require("./types");
 var unit_component_1 = require("./unit-component");
 function wrapRenderedIntoUnitComponent(parent, htmlComponent, componentPipeline) {
@@ -24,5 +25,4 @@ function wrapRenderedIntoUnitComponent(parent, htmlComponent, componentPipeline)
     unitComponent.text = texts.join('');
     return unitComponent;
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = wrapRenderedIntoUnitComponent;

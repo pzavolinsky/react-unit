@@ -1,62 +1,20 @@
-// Note: you should use var createComponent = require('react-unit');
-var createComponent = require('./react-unit');
-var React = require('react');
+// Note: you should use const createComponent = require('react-unit');
+const createComponent = require('./react-unit');
+const React = require('react');
 
-var SubItem = React.createClass({
-  render: function() {
-    return <i>{this.props.children}</i>
-  }
-});
-
-var Item = React.createClass({
-  render: function() {
-    return <span>{this.props.children}</span>
-  }
-});
-
-var It = React.createClass({
-  render: function() {
-    return <span>{this.props.children}</span>
-  }
-});
-
-var Items = React.createClass({
-  render: function() {
-    return <div>{this.props.children}</div>
-  }
-});
-
-var Blink = React.createClass({
-  render: function() {
-    return <blink>{this.props.children}</blink>
-  }
-});
-
-var Cite = React.createClass({
-  render: function() {
-    return <cite>{this.props.children}</cite>
-  }
-});
-
-class Original extends React.Component {
-  render() {
-    return <span>I'm the original</span>;
-  }
-}
-class Mock extends React.Component {
-  render() {
-    return <span>I'm the mock</span>;
-  }
-}
-class Parent extends React.Component {
-  render() {
-    return <Original />;
-  }
-}
+const SubItem = ({ children}) => <i>{children}</i>;
+const Item = ({ children}) => <span>{children}</span>;
+const It = ({ children}) => <span>{children}</span>;
+const Items = ({ children}) => <div>{children}</div>;
+const Blink = ({ children}) => <blink>{children}</blink>;
+const Cite = ({ children}) => <cite>{children}</cite>;
+const Original = () => <span>I'm the original</span>;
+const Mock = () => <span>I'm the mock</span>;
+const Parent = () => <Original />;
 
 describe('mock', () => {
   it('can mock components', () => {
-    var component = createComponent.mock(Item, Blink)(
+    const component = createComponent.mock(Item, Blink)(
       <Items>
         <Item>1</Item>
         <Item>2</Item>
@@ -65,8 +23,8 @@ describe('mock', () => {
       </Items>
     );
 
-    var found = component.findByQuery('blink');
-    var found1 = component.findByQuery('blink:contains(4)');
+    const found = component.findByQuery('blink');
+    const found1 = component.findByQuery('blink:contains(4)');
 
     expect(found.length).toEqual(4);
     expect(found1.length).toEqual(1);
@@ -74,7 +32,7 @@ describe('mock', () => {
   });
 
   it('can mock components repeatedly', () => {
-    var component = createComponent
+    const component = createComponent
       .mock(Item, Blink)
       .mock(It, Cite)(
         <Items>
@@ -85,9 +43,9 @@ describe('mock', () => {
         </Items>
       );
 
-    var found = component.findByQuery('div');
-    var foundBlinks = component.findByQuery('blink');
-    var foundCites = component.findByQuery('cite');
+    const found = component.findByQuery('div');
+    const foundBlinks = component.findByQuery('blink');
+    const foundCites = component.findByQuery('cite');
 
     expect(found.length).toEqual(1);
     expect(foundBlinks.length).toEqual(2);
@@ -99,7 +57,7 @@ describe('mock', () => {
   });
 
   it('can be combined with exclude', () => {
-    var component = createComponent
+    const component = createComponent
       .mock(Item, Blink)
       .exclude(Cite)(
         <Items>
@@ -109,8 +67,8 @@ describe('mock', () => {
         </Items>
       );
 
-    var foundBlinks = component.findByQuery('blink');
-    var foundCites = component.findByQuery('cite');
+    const foundBlinks = component.findByQuery('blink');
+    const foundCites = component.findByQuery('cite');
 
     expect(foundBlinks.length).toEqual(2);
     expect(foundCites.length).toEqual(0);

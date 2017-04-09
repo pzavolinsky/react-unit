@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ramda_1 = require("ramda");
 var render_instance_1 = require("./render-instance");
 var types_1 = require("./types");

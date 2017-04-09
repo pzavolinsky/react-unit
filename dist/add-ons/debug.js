@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ramda_1 = require("ramda");
 var instanceLogger = function (instance) {
     console.log('[instance]', instance);
@@ -19,5 +20,4 @@ var debug = function (ctx) { return function () {
         resolveMapper: ramda_1.compose(resolveLogger, ctx.resolveMapper)
     });
 }; };
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = debug;

@@ -1,47 +1,45 @@
-// Note: you should use var createComponent = require('react-unit');
-var createComponent = require('./react-unit');
-var React = require('react');
+// Note: you should use const createComponent = require('react-unit');
+const createComponent = require('./react-unit');
+const React = require('react');
 
-var Stateful = React.createClass({
-  getInitialState: function() {
-    return { value: this.props.value };
-  },
-  onChange: function(e) {
+class Stateful extends React.Component {
+  constructor(props, ctx) {
+    super(props, ctx);
+    this.state = { value: this.props.value };
+    this.onChange = this.onChange.bind(this);
+  }
+  onChange(e) {
     this.setState({value: e.target.value});
-  },
-  render: function() {
-    return <input value={this.state.value} onChange={this.onChange} />
   }
-});
-
-var StatefulWrapper = React.createClass({
-  render: function() {
-    return <div><Stateful {...this.props} /></div>;
+  render() {
+    return <input value={this.state.value} onChange={this.onChange} />;
   }
-});
+}
+const StatefulWrapper = props => <div><Stateful {...props} /></div>;
 
-var SetStateBeforeMount = React.createClass({
-  getInitialState: function() {
-    return {mounted: 'false'};
-  },
-  componentWillMount: function() {
+class SetStateBeforeMount extends React.Component {
+  constructor(props, ctx) {
+    super(props, ctx);
+    this.state = {mounted: 'false'};
+  }
+  componentWillMount() {
     this.setState({mounted: 'true'});
-  },
-  render: function() {
+  }
+  render() {
     return <span className="status">{this.state.mounted}</span>
   }
-});
+}
 
 describe('stateful controls', () => {
   it('should handle input changes', () => {
-    var component = createComponent(<Stateful value="original" />);
-    var input = component.findByQuery('input')[0];
+    const component = createComponent(<Stateful value="original" />);
+    const input = component.findByQuery('input')[0];
 
     input.onChange({target:{value: 'new!'}});
 
     // Render the component with the new state into a new component:
-    var newComponent = component.renderNew();
-    var newInput = newComponent.findByQuery('input')[0];
+    const newComponent = component.renderNew();
+    const newInput = newComponent.findByQuery('input')[0];
 
     // Note that each time we render we get a new component with new
     // elements:
@@ -58,7 +56,7 @@ describe('stateful controls', () => {
 
     // We will create the component in interleaved mode so that we can access
     // the <Stateful> child component.
-    var component = createComponent.interleaved(
+    const component = createComponent.interleaved(
       <StatefulWrapper value="original" />
     );
 
@@ -66,25 +64,25 @@ describe('stateful controls', () => {
     // console.log(component.dump());
 
     // Emit the onChange event.
-    var input = component.findByQuery('input')[0];
+    const input = component.findByQuery('input')[0];
     input.onChange({target:{value: 'new!'}});
 
     // Find the Stateful component (this only works in interleaved and shallow
     // mode, you could also try findByQuery('input') in the default mode).
-    var stateful = component.findByQuery('Stateful')[0];
-    // or var stateful = component.findByComponent(Stateful)[0];
-    // or var stateful = component.findByQuery('input')[0];
+    const stateful = component.findByQuery('Stateful')[0];
+    // or const stateful = component.findByComponent(Stateful)[0];
+    // or const stateful = component.findByQuery('input')[0];
 
     // Note that we need to call renderNew on the Stateful component
     // and not on the root StatefulWrapper.
-    var newStateful = stateful.renderNew();
-    var newInput = newStateful.findByQuery('input')[0];
+    const newStateful = stateful.renderNew();
+    const newInput = newStateful.findByQuery('input')[0];
 
     expect(newInput.props.value).toEqual('new!');
   });
 
   it('can set state in their componentWillMount', () => {
-    var component = createComponent(<SetStateBeforeMount />);
+    const component = createComponent(<SetStateBeforeMount />);
 
     expect(component.findByQuery('.status')[0].text).toEqual('true');
   });

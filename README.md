@@ -5,6 +5,8 @@ React Unit is a lightweight unit test library for ReactJS with very few (js-only
 
 By using `react-unit` you can run your ReactJS unit tests directly from node or gulp without having to install any heavyweight external dependencies (such as `jsdom`, `phantomjs`, the python runtime, etc.).
 
+Note: for testing simple components you might also be interested in [react-cucumber](https://github.com/pzavolinsky/react-cucumber).
+
 Installation
 ------------
 

@@ -6,6 +6,7 @@
 // UnitComponent is a bit complex and deserves a whole file, see
 // `unit-component.ts`.
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultRenderContext = ({
     instanceMapper: function (i) { return i; },
     componentMapper: function (c) { return c; },

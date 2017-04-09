@@ -1,6 +1,6 @@
 import { Children } from 'react';
 import { mergeAll } from 'ramda';
-import { createRenderer } from 'react-addons-test-utils';
+import ReactShallowRenderer = require('react-test-renderer/shallow');
 import
   { ReactInstance
   , RenderedComponent
@@ -116,7 +116,7 @@ export const toArtificialHtml = (
 
 const renderInstance = (instance:ReactInstance):RenderedComponent => {
 
-  const shallowRenderer = createRenderer();
+  const shallowRenderer = new ReactShallowRenderer();
 
   function create(componentInstance:ReactInstance):RenderedComponent {
 

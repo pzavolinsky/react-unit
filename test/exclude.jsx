@@ -1,28 +1,14 @@
-// Note: you should use var createComponent = require('react-unit');
-var createComponent = require('./react-unit');
-var React = require('react');
+// Note: you should use const createComponent = require('react-unit');
+const createComponent = require('./react-unit');
+const React = require('react');
 
-var SubItem = React.createClass({
-  render: function() {
-    return <i>{this.props.children}</i>
-  }
-});
-
-var Item = React.createClass({
-  render: function() {
-    return <span>{this.props.children}</span>
-  }
-});
-
-var Items = React.createClass({
-  render: function() {
-    return <div>{this.props.children}</div>
-  }
-});
+const SubItem = ({ children }) => <i>{children}</i>;
+const Item = ({ children}) => <span>{children}</span>;
+const Items = ({ children}) => <div>{children}</div>;
 
 describe('exclude', () => {
   it('can "skip" a component using createComponent directly', () => {
-    var component = createComponent.exclude(Item)(
+    const component = createComponent.exclude(Item)(
       <Items>
         <Item>1</Item>
         <Item>2</Item>
@@ -31,14 +17,14 @@ describe('exclude', () => {
       </Items>
     );
 
-    var found = component.findByQuery('span:contains(1)');
+    const found = component.findByQuery('span:contains(1)');
 
     expect(found.length).toEqual(0);
   });
 
   it('can reverts skip after run once', () => {
 
-    var component = createComponent(
+    const component = createComponent(
       <Items>
         <Item>1</Item>
         <Item>2</Item>
@@ -47,13 +33,13 @@ describe('exclude', () => {
       </Items>
     );
 
-    var found = component.findByQuery('span:contains(1)');
+    const found = component.findByQuery('span:contains(1)');
 
     expect(found.length).toEqual(1);
   });
 
   it('can "skip" a component using createComponent.shallow', () => {
-    var component = createComponent
+    const component = createComponent
       .exclude(Item)
       .shallow(<Items><Item/></Items>);
 
@@ -61,7 +47,7 @@ describe('exclude', () => {
   });
 
   it('can "skip" a component using createComponent.interleaved', () => {
-    var component = createComponent.exclude(Item).interleaved(
+    const component = createComponent.exclude(Item).interleaved(
       <Items>
         <Item>1</Item>
         <Item>2</Item>
@@ -70,13 +56,13 @@ describe('exclude', () => {
       </Items>
     );
 
-    var found = component.findByQuery('span:contains(1)');
+    const found = component.findByQuery('span:contains(1)');
 
     expect(found.length).toEqual(0);
   });
 
   it('does not affect nesting', () => {
-    var component = createComponent(
+    const component = createComponent(
       <Items>
         <Item>
           1
@@ -88,13 +74,13 @@ describe('exclude', () => {
       </Items>
     );
 
-    var found = component.findByQuery('i:contains("Hello World")');
+    const found = component.findByQuery('i:contains("Hello World")');
 
     expect(found.length).toEqual(1);
   });
 
   it('can be nested and still exclude', () => {
-    var component = createComponent.exclude(SubItem)(
+    const component = createComponent.exclude(SubItem)(
       <Items>
         <Item>
           1
@@ -106,13 +92,13 @@ describe('exclude', () => {
       </Items>
     );
 
-    var found = component.findByQuery('i:contains("Hello World")');
+    const found = component.findByQuery('i:contains("Hello World")');
 
     expect(found.length).toEqual(0);
   });
 
   it('can exclude multi', () => {
-    var component = createComponent.exclude([Item, SubItem])(
+    const component = createComponent.exclude([Item, SubItem])(
       <Items>
         <SubItem>Hello World</SubItem>
         <Item>1</Item>
@@ -126,7 +112,7 @@ describe('exclude', () => {
   });
 
   it('dump is correct', () => {
-    var component = createComponent.exclude(Item)(
+    const component = createComponent.exclude(Item)(
       <Items>
         <Item>1</Item>
         <Item>2</Item>

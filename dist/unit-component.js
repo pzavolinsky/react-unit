@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var R = require("ramda");
 var types_1 = require("./types");
 var utils_1 = require("./utils");

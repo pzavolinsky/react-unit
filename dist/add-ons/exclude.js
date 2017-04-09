@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ramda_1 = require("ramda");
 var utils_1 = require("../utils");
 var excludeMapper = function (exclude) {
@@ -12,5 +13,4 @@ var exclude = function (ctx) {
         componentMapper: ramda_1.compose(excludeMapper(exclude), ctx.componentMapper)
     }); };
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = exclude;

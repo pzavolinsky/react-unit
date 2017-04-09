@@ -1,56 +1,42 @@
-// Note: you should use var createComponent = require('react-unit');
-var createComponent = require('./react-unit');
-var React = require('react');
-var R = require('ramda');
+// Note: you should use const createComponent = require('react-unit');
+const createComponent = require('./react-unit');
+const React = require('react');
+const R = require('ramda');
 
-var Child = React.createClass({
-  render: function() { return <h1>{this.props.title}</h1> }
-});
+const Child = ({ title }) => <h1>{title}</h1>;
+const Master = () => <div><Child title="First Child"/></div>;
+const SuperMaster = () => <Master/>;
+const MasterList = ({ titles }) =>
+  <ul>
+    {titles.map((t,i) => <li key={i}><Child title={t}/></li>)}
+  </ul>;
 
-var Master = React.createClass({
-  render: function() { return <div><Child title="First Child"/></div> }
-});
-
-var SuperMaster = React.createClass({
-  render: function() { return <Master/> }
-});
-
-var MasterList = React.createClass({
-  render: function() {
-    var children = this.props.titles.map((t,i) => <li key={i}>
-      <Child title={t}/>
-    </li>);
-    return <ul>{children}</ul>
-  }
-});
-
-var titles = [
+const titles = [
   'Raiders of the Lost Ark',
   'Temple of Doom',
   'Last Crusade'
 ];
 
-var Person = React.createClass({
-  render: function() {
-    var children = React.Children.map(this.props.children, (c,i) => <li key={i}>{c}</li>);
-    return <div><h1>{this.props.name}</h1><ul>{children}</ul></div>
-  }
-});
+const Person = ({ name,children }) =>
+  <div>
+      <h1>{name}</h1>
+      <ul>{React.Children.map(children, (c,i) => <li key={i}>{c}</li>)}</ul>
+  </div>;
 
 describe('createComponent.interleaved', () => {
   it('renders recursively, preserving components', () => {
-    var component = createComponent.interleaved(
+    const component = createComponent.interleaved(
       <Person name="Homer">
         <Person name="Bart"/>
         <Person name="Lisa" />
         <Person name="Maggie" />
       </Person>);
 
-    var lisaComp    = component.findByQuery('Person[name=Lisa]')[0];
-    var lisaCompAlt = component.findByComponent(Person)[2];
+    const lisaComp    = component.findByQuery('Person[name=Lisa]')[0];
+    const lisaCompAlt = component.findByComponent(Person)[2];
 
-    var lisaName    = component.findByQuery('Person[name=Lisa] h1')[0];
-    var lisaNameAlt = lisaComp.findByQuery('h1')[0];
+    const lisaName    = component.findByQuery('Person[name=Lisa] h1')[0];
+    const lisaNameAlt = lisaComp.findByQuery('h1')[0];
 
     expect(lisaComp.prop('name')).toEqual('Lisa');
     expect(lisaComp).toBe(lisaCompAlt);
@@ -60,35 +46,35 @@ describe('createComponent.interleaved', () => {
   });
 
   it('should find component in deeply nested components', () => {
-    var component = createComponent.interleaved(<SuperMaster />);
+    const component = createComponent.interleaved(<SuperMaster />);
 
-    var results = component.findByQuery('Child');
+    const results = component.findByQuery('Child');
 
     expect(results.length).toEqual(1);
   });
 
   it('should expose the props from the component', () => {
-    var component = createComponent.interleaved(<SuperMaster />);
+    const component = createComponent.interleaved(<SuperMaster />);
 
-    var results = component.findByQuery('Child')[0];
+    const results = component.findByQuery('Child')[0];
 
     expect(results.prop('title')).toEqual('First Child');
   });
 
   it('should render the actual components', () => {
-    var component = createComponent.interleaved(<SuperMaster />);
+    const component = createComponent.interleaved(<SuperMaster />);
 
-    var results = component.findByQuery('Child')[0];
+    const results = component.findByQuery('Child')[0];
 
     expect(results.prop('title')).toEqual('First Child');
   });
 
   it('should render deep component trees', () => {
-    var component = createComponent.interleaved(<MasterList titles={titles} />);
+    const component = createComponent.interleaved(<MasterList titles={titles} />);
 
-    var lis = component.findByQuery('li');
-    var children = component.findByQuery('li > Child');
-    var h1s = component.findByQuery('li > Child > h1');
+    const lis = component.findByQuery('li');
+    const children = component.findByQuery('li > Child');
+    const h1s = component.findByQuery('li > Child > h1');
 
     expect(lis.length).toEqual(titles.length);
     expect(children.length).toEqual(titles.length);

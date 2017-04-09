@@ -1,4 +1,4 @@
-import * as React from 'react';
+const React = require('react');
 import renderInstance from '../render-instance';
 import { isHtml, isUnknown } from '../types';
 

@@ -1,5 +1,5 @@
 import { contains, merge } from 'ramda';
-import { isElementOfType } from 'react-addons-test-utils';
+import { isElementOfType } from 'react-dom/test-utils';
 import
   { RenderedComponent
   , isHtml

@@ -1,4 +1,4 @@
-// Note: you should use var createComponent = require('react-unit');
+// Note: you should use const createComponent = require('react-unit');
 const createComponent = require('./react-unit');
 const React = require('react');
 
