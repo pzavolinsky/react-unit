@@ -67,7 +67,7 @@ export class UnitComponent {
 
     return R.compose(
       R.concat(ret),
-      R.filter(R.identity),
+      R.filter((c:UnitComponent) => !!c),
       R.flatten,
       R.map((c:UnitComponent) => c.findBy && c.findBy(fn))
     )(children);
