@@ -7,7 +7,7 @@ var sizzle = require("./sizzle-bundle");
 var ROOT = 'root';
 var isNotRoot = function (c) { return c !== ROOT; };
 // Component wrapper
-var UnitComponent = (function () {
+var UnitComponent = /** @class */ (function () {
     function UnitComponent(comp, parent, renderNew) {
         this.nodeType = 1;
         this.type = comp.tagName;
@@ -40,7 +40,7 @@ var UnitComponent = (function () {
             return ret;
         if (children.length === undefined)
             children = [children];
-        return R.compose(R.concat(ret), R.filter(R.identity), R.flatten, R.map(function (c) { return c.findBy && c.findBy(fn); }))(children);
+        return R.compose(R.concat(ret), R.filter(function (c) { return !!c; }), R.flatten, R.map(function (c) { return c.findBy && c.findBy(fn); }))(children);
     };
     UnitComponent.prototype.findByRef = function (ref) {
         return this.findBy(function (c) { return c.ref == ref; });

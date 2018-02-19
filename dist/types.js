@@ -1,3 +1,4 @@
+"use strict";
 // The goal of react-unit is to process react `instances` and turn them into
 // `UnitComponents`. So, when all is said and done,react-unit looks like:
 //
@@ -5,7 +6,6 @@
 //
 // UnitComponent is a bit complex and deserves a whole file, see
 // `unit-component.ts`.
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultRenderContext = ({
     instanceMapper: function (i) { return i; },
